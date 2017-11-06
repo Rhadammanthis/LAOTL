@@ -1,21 +1,31 @@
 import React, { Component } from 'react';
 import {
-    Platform, StyleSheet, Text, View,
-    ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image
+    View, TextInput, ScrollView,
+    TouchableOpacity, Image, Text,
+    StyleSheet
 } from 'react-native';
 import { connect } from 'react-redux';
+import { searchChanged, doSerach } from '../actions'
 
-class Home extends Component {
+class Search extends Component {
 
     componentWillMount() {
 
-        console.log(this.props.episodes)
-
     }
 
-    renderEpisodes() {
-        {
+    onSearchChange(text) {
+        this.props.searchChanged(text);
+    }
+
+    onSubmitSearch() {
+        this.props.doSerach(this.props.episodes, this.props.searchText)
+        console.log(this.props.searchText)
+    }
+
+    renderSearchResults() {
+        if (this.props.searchResults != null) {
+
+            // console.log(this.props.searchResults.map(x => ( console.log(x.title) )))
 
             var sortCategoryResource = (category) => {
                 switch (category) {
@@ -42,38 +52,44 @@ class Home extends Component {
                 }
             }
 
-            return Object.keys(this.props.episodes).slice(0, 10).map((i) => (
-                <TouchableOpacity key={i} style={{ height: 80 }}>
+            return this.props.searchResults.map((element) => (
+                <TouchableOpacity key={element.number} style={{ height: 90 }}>
                     <View style={{ flex: 1, flexDirection: 'row', marginTop: 5, marginBottom: 5 }}>
                         <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
-                            <Text style={styles.title}>{this.props.episodes[i].number}</Text>
-                            <Text style={{ color: '#F6502C' }}>{sortCategoryResource(this.props.episodes[i].category)}</Text>
+                            <Text style={[styles.title, { fontSize: 20 }]}>{element.number}</Text>
+                            <Text style={{ color: '#F6502C' }}>{sortCategoryResource(element.category)}</Text>
                         </View>
                         {/* <View style={{ width: 2, height: 80, backgroundColor: '#F6502C', marginHorizontal: 5, marginVertical: 5 }} /> */}
                         <View style={{ flex: 6 }}>
-                            <Text style={styles.title}>{this.props.episodes[i].title}</Text>
-                            <Text style={styles.description}>
-                                {this.props.episodes[i].description}
+                            <Text style={styles.title}>{element.title}</Text>
+                            <Text numberOfLines={3} style={styles.description}>
+                                {element.description}
                             </Text>
                         </View>
                         <Image style={{ flex: 3, height: 100 }}
-                            source={{ uri: this.props.episodes[i].image }} />
+                            source={{ uri: element.image }} />
                     </View>
                 </TouchableOpacity>
             ))
         }
+        return
     }
 
     render() {
 
         return (
-            <View style={{ flex: 1 }}>
-                <ScrollView style={{ backgroundColor: '#171612' }}>
-                    {this.renderEpisodes()}
+            <View style={{ backgroundColor: '#171612', flex: 1, paddingTop: 10 }}>
+                <ScrollView style={{}}>
+                    <TextInput onChangeText={this.onSearchChange.bind(this)} value={this.props.searchText}
+                        onSubmitEditing={this.onSubmitSearch.bind(this)} style={{ fontSize: 17, height: 40, borderColor: '#F37752', borderWidth: 1, backgroundColor: 'white', borderRadius: 15 }} />
+                    <View style={{ height: 1.2, backgroundColor: '#F37752', marginVertical: 10 }}/>
+                    {this.renderSearchResults()}
                 </ScrollView>
             </View>
         );
+
     }
+
 }
 
 const styles = StyleSheet.create({
@@ -98,17 +114,18 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 13,
-        color: '#904B35',
+        color: 'white',
     },
 });
 
-const mapStateToProps = ({ data }) => {
+const mapStateToProps = ({ search, data }) => {
 
+    const { searchText, searchResults } = search;
     const { episodes } = data;
 
     return {
-        episodes
+        searchText, searchResults, episodes
     };
 };
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps, { searchChanged, doSerach })(Search)

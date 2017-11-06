@@ -1,13 +1,14 @@
 import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import SplashScreen from './components/Splash';
-import HomeScreen from './components/Home';
-import EpisodesList from './components/EpisodesList'
+import Featured from './components/Featured';
+import Archive from './components/Archive';
+import Search from './components/Search';
 
 var mainFlow = TabNavigator(
 	{
-		HomeScreen: {
-			screen: HomeScreen,
+		Featured: {
+			screen: Featured,
 			navigationOptions: ({ navigation }) => ({
 				title: `Featured`,
 				headerLeft: null,
@@ -17,10 +18,21 @@ var mainFlow = TabNavigator(
 				}
 			})
 		},
-		ListScreen: {
-			screen: EpisodesList,
+		Archive: {
+			screen: Archive,
 			navigationOptions: ({ navigation }) => ({
 				title: `Archive`,
+				headerLeft: null,
+				headerTitleStyle: { alignSelf: "center", color: '#F37752' },
+				headerStyle: {
+					backgroundColor: '#211f19'
+				}
+			})
+		},
+		Search: {
+			screen: Search,
+			navigationOptions: ({ navigation }) => ({
+				title: `Search`,
 				headerLeft: null,
 				headerTitleStyle: { alignSelf: "center", color: '#F37752' },
 				headerStyle: {
