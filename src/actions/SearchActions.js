@@ -23,6 +23,24 @@ export const doSerach = (episodes, textToSearch) => {
                 
                 if(levenshtein(label, normalizedTextToSearch) <= 1)
                     matches.push(episodes[x])
+                else{
+                    const labelItems = label.split(" ");
+                    const textItems = normalizedTextToSearch.split(" ")
+
+                    console.log("Label items", labelItems)
+                    console.log("Text items", textItems)
+
+                    for(var i = 0; i < textItems.length; i++){
+                        for(var j = 0; j < labelItems.length; j++){
+                            if(levenshtein(labelItems[j], textItems[i]) <= 1){
+                                matches.push(episodes[x])
+                                break;
+                            }
+                        }
+                        if(j != labelItems.length - 1)
+                            break;
+                    }
+                }
             });
             // console.log('Actions...', Object.keys(episodes).slice(0, 10))
             // console.log(`Search: ${textToSearch.toLowerCase()}, Label: ${episodes[x].labels}, Levebshtein: ${levenshtein(episodes[x].labels, textToSearch.toLowerCase())}`)
