@@ -17,8 +17,10 @@ class Archive extends Component {
 
     renderEpisodes() {
 
+        const { navigate } = this.props.navigation;
+
         return Object.keys(this.props.episodes).slice(0, 10).map((i) => (
-            <EpisodeListItem key={i} episode={this.props.episodes[i]} />
+            <EpisodeListItem key={i} episode={this.props.episodes[i]} navigate={navigate} />
         ))
 
     }

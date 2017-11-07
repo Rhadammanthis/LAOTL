@@ -4,6 +4,7 @@ import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
 import Archive from './components/Archive';
 import Search from './components/Search';
+import Episode from './components/Episode'
 
 var mainFlow = TabNavigator(
 	{
@@ -67,6 +68,9 @@ export default StackNavigator(
 			navigationOptions: ({ navigation }) => ({
 				title: 'Last App On The Left',
 			  })
-		}
+		},
+		Episode: {
+			screen: Episode
+		},
 	}
 );

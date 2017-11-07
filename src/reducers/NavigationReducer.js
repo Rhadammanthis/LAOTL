@@ -1,4 +1,4 @@
-import { Animated } from 'react-native';
+import { BackHandler, Platform } from 'react-native';
 import {
     FETCH_DATA,
     CHECK_NETWORK
@@ -10,9 +10,15 @@ const INITIAL_STATE = AppNavigator.router.getStateForAction(NavigationActions.in
 
 export default (state = INITIAL_STATE, actions) => {
 
-    // if (actions.type === 'Navigation/BACK' && state && state.routes[state.index].routeName === 'HomeScreen') {
-    //     return null;
-    // }
+    //Checks if the application flow is currently in the MainFlow view
+    if (actions.type === 'Navigation/BACK' && state && state.routes[state.index].routeName === 'MainFlow') {
+        
+        //Check if the platform currently running the app is Android. If so, close the app
+        if(Platform.OS === 'android')
+            BackHandler.exitApp(); 
+
+        return state;
+    }
 
     const nextState = AppNavigator.router.getStateForAction(actions, state);
 

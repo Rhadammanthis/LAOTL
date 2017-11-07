@@ -1,4 +1,4 @@
 export * from './SplashActions';
 export * from './SearchActions';
-// export * from './MovieDetailActions';
+export * from './EpisodeActions';
 // export * from './SongListActions';

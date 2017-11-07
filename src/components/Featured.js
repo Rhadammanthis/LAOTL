@@ -8,8 +8,6 @@ import { connect } from 'react-redux';
 
 class Featured extends Component {
 
-
-
     componentWillMount() {
 
         console.log('From firebase', this.props.episodes)

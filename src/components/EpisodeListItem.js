@@ -4,12 +4,18 @@ import {
     ActivityIndicator, Animated, ScrollView,
     TouchableOpacity, Image
 } from 'react-native';
+import { connect } from 'react-redux';
+import { selectEpisode } from '../actions'
 
 class EpisodeListItem extends Component {
 
     componentWillMount() {
 
+    }
 
+    onEpisodeSelected(){
+        console.log('Clicked!')
+        this.props.selectEpisode(this.props.episode, this.props.navigate)
     }
 
     render() {
@@ -42,7 +48,7 @@ class EpisodeListItem extends Component {
         }
 
         return (
-            <TouchableOpacity style={{ height: 110 }}>
+            <TouchableOpacity style={{ height: 110 }} onPress={this.onEpisodeSelected.bind(this)}>
                 <View style={{ flex: 1, flexDirection: 'row', marginTop: 5, marginBottom: 5 }}>
                     <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 5 }}>
                         <Text style={[styles.title, { fontSize: 20 }]}>{episode.number}</Text>
@@ -89,4 +95,13 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EpisodeListItem
+const mapStateToProps = ({ data }) => {
+
+    const { selectedEpisode } = data;
+
+    return {
+        selectedEpisode
+    };
+};
+
+export default connect(mapStateToProps, { selectEpisode })(EpisodeListItem)

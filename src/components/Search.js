@@ -26,8 +26,10 @@ class Search extends Component {
     renderSearchResults() {
         if (this.props.searchResults != null) {
 
+            const { navigate } = this.props.navigation;
+
             return this.props.searchResults.map((element) => (
-                <EpisodeListItem key={element.number} episode={element} />
+                <EpisodeListItem key={element.number} episode={element} navigate={navigate} />
             ))
         }
         return
