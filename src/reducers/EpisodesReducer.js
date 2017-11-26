@@ -15,7 +15,7 @@ export default (state = INITIAL_STATE, action) => {
         case EPISODES_FETCHED:
             return { ...state, episodes: action.payload };
         case SELECTED_EPISODE:
-            return { ...state, selectedEpisode: action.payload }
+            return { ...state, selectedEpisode: action.payload, alpha: 0 }
         case FADE_NAVBAR:
             // console.log("Alpha ", action.payload)
             return { ...state, alpha: action.payload }
