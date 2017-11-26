@@ -32,7 +32,8 @@ class Episode extends Component {
                     <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
                     <Transparency size={35} />
                     <View style={{ flex: 1, flexDirection: 'row' }}>
-                        <Text style={{ flex: 8, color: '#F37752', fontWeight: 'bold', fontSize: 35, marginTop: -25, marginHorizontal: 10 }}>
+                        <Text style={{ flex: 8, color: '#F37752', fontWeight: 'bold', fontSize: 35, marginTop: -25, marginHorizontal: 10,
+                            opacity: (1 - this.props.alpha) }}>
                             {this.props.selectedEpisode.title}
                         </Text>
                         <View style={{ flex: 2, flexDirection: 'row' }}>
