@@ -61,7 +61,7 @@ class EpisodeListItem extends Component {
                             {episode.description}
                         </Text>
                     </View>
-                    <Image numberOfLines={2} style={{ flex: 3, height: 100 }}
+                    <Image style={{ flex: 3, height: 100 }}
                         source={{ uri: episode.image }} />
                 </View>
             </TouchableOpacity>

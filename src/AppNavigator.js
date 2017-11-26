@@ -51,7 +51,7 @@ var mainFlow = TabNavigator(
 			style: {
 				backgroundColor: '#211f19'
 			}
-	  	}
+		}
 	}
 )
 
@@ -67,10 +67,19 @@ export default StackNavigator(
 			screen: mainFlow,
 			navigationOptions: ({ navigation }) => ({
 				title: 'Last App On The Left',
-			  })
+			})
 		},
 		Episode: {
-			screen: Episode
+			screen: Episode,
+			navigationOptions: ({ navigation }) => ({
+				title: `${navigation.state.params.number} - ${navigation.state.params.title}`,
+				headerTintColor: '#F6502C',
+				headerTitleStyle: { color: '#F37752' },
+				headerStyle: {
+					backgroundColor: navigation.state.params.color ? navigation.state.params.color : '#211f19'
+				},
+				header: navigation.state.params.showNavBar ? undefined : null
+			})
 		},
 	}
 );
