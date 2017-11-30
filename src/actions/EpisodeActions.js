@@ -12,22 +12,22 @@ export const selectEpisode = (episode, navigate) => {
     };
 };
 
-export const toggleNavbarAlpha = (scroll) => {
+export const toggleNavbarFade = (scroll) => {
 
-    var newAlpha;
+    var newOpacity;
     
     if(scroll > 175 && scroll < 225){
-        newAlpha = (scroll - 175) * 0.02
+        newOpacity = (scroll - 175) * 0.02
     }
     else
         if(scroll <= 175)
-            newAlpha = 0;
+            newOpacity = 0;
         else
-            newAlpha = 1;
+            newOpacity = 1;
 
     return {
         type: FADE_NAVBAR,
-        payload: newAlpha
+        payload: newOpacity
     }
 
 }

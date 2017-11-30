@@ -72,13 +72,7 @@ export default StackNavigator(
 		Episode: {
 			screen: Episode,
 			navigationOptions: ({ navigation }) => ({
-				title: `${navigation.state.params.number} - ${navigation.state.params.title}`,
-				headerTintColor: '#F6502C',
-				headerTitleStyle: { color: '#F37752' },
-				headerStyle: {
-					backgroundColor: navigation.state.params.color ? navigation.state.params.color : '#211f19'
-				},
-				header: navigation.state.params.showNavBar ? undefined : null
+				header: null
 			})
 		},
 	}

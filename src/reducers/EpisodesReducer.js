@@ -7,7 +7,7 @@ import {
 const INITIAL_STATE = { 
     episodes: null,
     selectedEpisode: null,
-    alpha: 0
+    fade: 0
  };
 
 export default (state = INITIAL_STATE, action) => {
@@ -18,7 +18,7 @@ export default (state = INITIAL_STATE, action) => {
             return { ...state, selectedEpisode: action.payload, alpha: 0 }
         case FADE_NAVBAR:
             // console.log("Alpha ", action.payload)
-            return { ...state, alpha: action.payload }
+            return { ...state, fade: action.payload }
         default:
             return state;
     }

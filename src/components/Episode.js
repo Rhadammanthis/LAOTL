@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
     Platform, StyleSheet, Text, View,
     ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image, Modal, TouchableNativeFeedback
+    TouchableOpacity, Image, Modal, TouchableNativeFeedback,
+    Linking
 } from 'react-native';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
@@ -13,15 +14,79 @@ class Episode extends Component {
 
     componentWillMount() {
 
-        const { setParams } = this.props.navigation;
-        console.log(this.props.selectedEpisode)
-        setParams({ showNavBar: false })
+        episode = this.props.selectedEpisode;
 
+    }
+
+    renderArticles() {
+        if (episode.show_notes && episode.show_notes.articles) {
+            return (
+                <View>
+                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                        ARTICLES
+                    </Text>
+                    <View>
+                        {
+                            episode.show_notes.articles.map((article, i) => {
+                                return (
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5}} onPress={() => { Linking.openURL(article.url) }}>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Image style={[styles.icon, {marginTop: 0}]} source={require('../images/article.png')} />
+                                        </View>
+                                        <View style={{ flex: 7}}>
+                                            <Text style={{fontSize: 20, color: 'white'}}>
+                                                {article.title}
+                                            </Text>
+                                            <Text style={{alignSelf: 'flex-start', fontSize: 10, color: 'white'}}>
+                                            by {article.source}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                    </View>
+                </View>
+            )
+        }
+    }
+
+    renderBooks() {
+        if (episode.show_notes && episode.show_notes.books) {
+            return (
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                        BOOKS
+                    </Text>
+                    <View>
+                        {
+                            episode.show_notes.books.map((book, i) => {
+                                return (
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5}} onPress={() => { Linking.openURL(book.amazon_link) }}>
+                                        <View style={{ flex: 2, marginRight: 10 }}>
+                                            <Image resizeMode={'contain'} style={{height: 130}} source={{ uri: book.cover }} />
+                                        </View>
+                                        <View style={{ flex: 7, alignItems: 'center'}}>
+                                            <Text style={{fontSize: 20, color: 'white'}}>
+                                                {book.title}
+                                            </Text>
+                                            <Text style={{alignSelf: 'flex-start', fontSize: 12, color: 'white'}}>
+                                            by {book.author}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                    </View>
+                </View>
+            )
+        }
     }
 
     render() {
 
-        const { setParams, goBack } = this.props.navigation;
+        const { goBack } = this.props.navigation;
 
         return (
             <View style={{ flex: 1 }}>
@@ -45,11 +110,18 @@ class Episode extends Component {
                     <Text style={styles.description}>
                         {this.props.selectedEpisode.description}
                     </Text>
+                    <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                    <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
+                        Show Notes
+                    </Text>
+                    {this.renderArticles()}
+                    {this.renderBooks()}
                     <View style={{ height: 1000 }} />
                 </ScrollView>
+                {/* Persistent NavBar components */}
                 <View style={[styles.navBar, { opacity: this.props.fade, }]}>
-                    <Text style={styles.navBarTitle}>
-                        {this.props.selectedEpisode.title}
+                    <Text style={styles.navBarTitle} numberOfLines={1}>
+                        {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
                     </Text>
                 </View>
                 <TouchableNativeFeedback style={styles.backButton}
