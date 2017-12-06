@@ -17,6 +17,36 @@ class Featured extends Component {
     render() {
 
         var mappedEpisodes = Object.keys(this.props.episodes).map((x) => { return this.props.episodes[x] })
+        let newestEpisode = mappedEpisodes.length - 1;
+        let lastRecentEpisode = mappedEpisodes.length - 7;
+        let recentEpisodes = [];
+
+        for(let i = newestEpisode; i > lastRecentEpisode; i--){
+            
+            recentEpisodes.push(  
+                <View style={ [styles.featureView] }>
+                    <View style={{ flex: 1 }}>
+                        <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
+                            source={{ uri: mappedEpisodes[i].image }}
+                            blurRadius={1.2}>
+                        </Image>
+                        <View>
+                            <View style={{ backgroundColor: '#171612', paddingVertical: 5, paddingHorizontal: 5, minWidth: 300, minHeight: 50 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
+                                    <Text style={{ color: '#F37752', fontSize: 15, flex: 1, paddingBottom: 5 }}>
+                                        {mappedEpisodes[i].number}
+                                    </Text>
+                                    <Text style={{ color: 'white', flex: 9, paddingBottom: 5, fontSize: 17 }}>
+                                        {mappedEpisodes[i].title}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            )
+        }
+                
 
         var sortCategoryResource = (category) => {
             switch (category) {
@@ -44,74 +74,10 @@ class Featured extends Component {
         }
 
         return (
-            <View style={{ flex: 1, flexDirection: 'column' }}>
-                <View style={{ flex: 2 }}>
-                    <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
-                        source={{ uri: mappedEpisodes[0].image }}
-                        blurRadius={1.2}>
-                        <View>
-                            <View style={{ backgroundColor: '#171612', paddingVertical: 3, paddingHorizontal: 5, minWidth: 300 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
-                                    <Text style={{ color: '#F37752', fontSize: 30, flex: 1 }}>
-                                        {mappedEpisodes[0].number}
-                                    </Text>
-                                    <Text style={{ color: 'white', flex: 9, paddingBottom: 5, fontSize: 17 }}>
-                                        {mappedEpisodes[0].title}
-                                    </Text>
-                                </View>
-                            </View>
-                            <View style={{ height: 3, backgroundColor: '#F37752', marginVertical: 3 }} />
-                            <View style={{ backgroundColor: '#171612', paddingVertical: 3, paddingHorizontal: 5, minWidth: 300 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
-                                    <Text style={{ color: '#F37752', fontSize: 30, flex: 2 }}>
-                                        {sortCategoryResource(mappedEpisodes[0].category)}
-                                    </Text>
-                                    <Text numberOfLines={4} style={{ color: 'white', flex: 8, paddingBottom: 5 }}>
-                                        {mappedEpisodes[0].description}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    </Image>
-                </View>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <View style={{ flex: 1 }}>
-                        <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
-                            source={{ uri: mappedEpisodes[1].image }}
-                            blurRadius={1.2}>
-                            <View>
-                                <View style={{ backgroundColor: '#171612', paddingVertical: 3, paddingHorizontal: 5, minWidth: 150 }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
-                                        <Text style={{ color: '#F37752', fontSize: 20, flex: 2 }}>
-                                            {mappedEpisodes[1].number}
-                                        </Text>
-                                        <Text style={{ color: 'white', flex: 8, paddingBottom: 5, fontSize: 12 }}>
-                                            {mappedEpisodes[1].title}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </View>
-                        </Image>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
-                            source={{ uri: mappedEpisodes[2].image }}
-                            blurRadius={1.2}>
-                            <View>
-                                <View style={{ backgroundColor: '#171612', paddingVertical: 3, paddingHorizontal: 5, minWidth: 150 }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
-                                        <Text style={{ color: '#F37752', fontSize: 20, flex: 2 }}>
-                                            {mappedEpisodes[2].number}
-                                        </Text>
-                                        <Text style={{ color: 'white', flex: 8, paddingBottom: 5, fontSize: 12 }}>
-                                            {mappedEpisodes[2].title}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </View>
-                        </Image>
-                    </View>
-                </View>
+            <View style={{ flex: 1, flexDirection: 'column', marginTop: 15 }}>
+                <ScrollView>
+                    { recentEpisodes }
+                </ScrollView>
             </View>
         );
     }
@@ -137,10 +103,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#F37752',
     },
-    description: {
-        fontSize: 13,
-        color: '#904B35',
+    featureView: {
+        minHeight: 250,
+        minWidth: 400,
     },
+
 });
 
 const mapStateToProps = ({ data }) => {
