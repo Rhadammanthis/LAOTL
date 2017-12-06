@@ -24,7 +24,7 @@ class Featured extends Component {
         for(let i = newestEpisode; i > lastRecentEpisode; i--){
             
             recentEpisodes.push(  
-                <View style={ [styles.featureView] }>
+                <View key={i} style={ [styles.featureView] }>
                     <View style={{ flex: 1 }}>
                         <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
                             source={{ uri: mappedEpisodes[i].image }}
@@ -74,7 +74,7 @@ class Featured extends Component {
         }
 
         return (
-            <View style={{ flex: 1, flexDirection: 'column', marginTop: 15 }}>
+            <View style={{ flex: 1, flexDirection: 'column' }}>
                 <ScrollView>
                     { recentEpisodes }
                 </ScrollView>
