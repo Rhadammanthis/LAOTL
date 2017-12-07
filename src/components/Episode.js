@@ -29,16 +29,16 @@ class Episode extends Component {
                         {
                             episode.show_notes.articles.map((article, i) => {
                                 return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5}} onPress={() => { Linking.openURL(article.url) }}>
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }} onPress={() => { Linking.openURL(article.url) }}>
                                         <View style={{ flex: 1, flexDirection: 'column' }}>
-                                            <Image style={[styles.icon, {marginTop: 0}]} source={require('../images/article.png')} />
+                                            <Image style={[styles.icon, { marginTop: 0 }]} source={require('../images/article.png')} />
                                         </View>
-                                        <View style={{ flex: 7}}>
-                                            <Text style={{fontSize: 20, color: 'white'}}>
+                                        <View style={{ flex: 7 }}>
+                                            <Text style={{ fontSize: 20, color: 'white' }}>
                                                 {article.title}
                                             </Text>
-                                            <Text style={{alignSelf: 'flex-start', fontSize: 10, color: 'white'}}>
-                                            by {article.source}
+                                            <Text style={{ alignSelf: 'flex-start', fontSize: 10, color: 'white' }}>
+                                                by {article.source}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -62,16 +62,92 @@ class Episode extends Component {
                         {
                             episode.show_notes.books.map((book, i) => {
                                 return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5}} onPress={() => { Linking.openURL(book.amazon_link) }}>
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }} onPress={() => { Linking.openURL(book.amazon_link) }}>
                                         <View style={{ flex: 2, marginRight: 10 }}>
-                                            <Image resizeMode={'contain'} style={{height: 130}} source={{ uri: book.cover }} />
+                                            <Image resizeMode={'contain'} style={{ height: 130 }} source={{ uri: book.cover }} />
                                         </View>
-                                        <View style={{ flex: 7, alignItems: 'center'}}>
-                                            <Text style={{fontSize: 20, color: 'white'}}>
+                                        <View style={{ flex: 7 }}>
+                                            <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>
                                                 {book.title}
                                             </Text>
-                                            <Text style={{alignSelf: 'flex-start', fontSize: 12, color: 'white'}}>
-                                            by {book.author}
+                                            <Text style={{ alignSelf: 'flex-start', fontSize: 12, color: 'white' }}>
+                                                by {book.author}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                    </View>
+                </View>
+            )
+        }
+    }
+
+    renderMovies() {
+        if (episode.show_notes && episode.show_notes.movies) {
+            return (
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                        MOVIES & DOCS
+                    </Text>
+                    <View>
+                        {
+                            episode.show_notes.movies.map((movie, i) => {
+                                return (
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }}
+                                        onPress={() => { Linking.openURL(`https://www.themoviedb.org/movie/${movie.id}`) }}>
+                                        <View style={{ flex: 2, marginRight: 10 }}>
+                                            <Image resizeMode={'contain'} style={{ height: 130 }} source={{ uri: movie.poster }} />
+                                        </View>
+                                        <View style={{ flex: 7 }}>
+                                            <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>
+                                                {movie.title}
+                                            </Text>
+                                            <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
+                                                Directed by {movie.director}
+                                            </Text>
+                                            <Text style={{ alignSelf: 'flex-start', fontSize: 12, color: 'white' }}>
+                                                {movie.release_date}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                    </View>
+                </View>
+            )
+        }
+    }
+
+    renderVideos() {
+        if (episode.show_notes && episode.show_notes.videos) {
+            return (
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                        VIDEOS
+                    </Text>
+                    <View>
+                        {
+                            episode.show_notes.videos.map((video, i) => {
+                                return (
+                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }}
+                                        onPress={() => { Linking.openURL(video.url) }}>
+                                        <View style={{ flex: 4, marginRight: 10, alignItems: 'center', justifyContent: 'center' }}>
+                                            <Image style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                                                source={{ uri: video.thumb_nail }} resizeMode={'contain'} />
+                                            <View style={{ opacity: 1 }}>
+                                                <Image style={{ height: 40, width: 40 }}
+                                                    source={require('../images/play_circle.png')} />
+                                            </View>
+                                        </View>
+                                        <View style={{ flex: 6, height: 100 }}>
+                                            <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>
+                                                {video.title}
+                                            </Text>
+                                            <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
+                                               {video.author}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -116,7 +192,9 @@ class Episode extends Component {
                     </Text>
                     {this.renderArticles()}
                     {this.renderBooks()}
-                    <View style={{ height: 1000 }} />
+                    {this.renderMovies()}
+                    {this.renderVideos()}
+                    {/* <View style={{ height: 1000 }} /> */}
                 </ScrollView>
                 {/* Persistent NavBar components */}
                 <View style={[styles.navBar, { opacity: this.props.fade, }]}>
