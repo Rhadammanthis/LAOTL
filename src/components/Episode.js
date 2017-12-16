@@ -11,12 +11,32 @@ import Constants from './common/Constants'
 import { connect } from 'react-redux';
 import { selectEpisode, toggleNavbarFade } from '../actions'
 
+
 class Episode extends Component {
 
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
 
+    }
+
+    renderAudioPlayer(){
+        return (
+            <View style={ [styles.audioPlayer] }>
+                <Image style={{ flex: 1, flexDirection: 'row', height: 250, marginTop: 55 }} source={{ uri: this.props.selectedEpisode.image }} />
+                <View style={{ flex: 1, flexDirection: 'row', }}>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}>
+                        <Image source={require('../images/audioPlayer/ic_fast_rewind.png')}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonPlay]}>
+                        <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}>
+                        <Image source={require('../images/audioPlayer/ic_fast_forward.png')}/>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
     }
 
     renderArticles() {
@@ -197,15 +217,16 @@ class Episode extends Component {
                     onScroll={(event) => {
                         this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
                     }}>
-                    <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
-                    <Transparency size={35} />
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
+
+                    {this.renderAudioPlayer()}
+
+                    <View style={{ flex: 1, flexDirection: 'row',  marginRight: 15, marginTop:35  }}>
                         <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
                             {this.props.selectedEpisode.title}
                         </Text>
                         <View style={{ flex: 2, flexDirection: 'row' }}>
                             <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
+                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10}}>
                                 {this.props.selectedEpisode.duration}
                             </Text>
                         </View>
@@ -270,7 +291,7 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
     },
     backButtonImage: {
         height: 25,
@@ -302,6 +323,39 @@ const styles = StyleSheet.create({
         fontSize: 35,
         marginTop: -25,
         marginHorizontal: 10
+    },
+    audioPlayer: {
+        flex: 1,
+        flexDirection: 'column',
+        minHeight: 400,
+        minWidth: 400,
+    },
+    audioButton: {
+        borderWidth:1,
+        borderColor:'rgba(0,0,0,0.2)',
+        borderRadius:100,
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor:'#efefef',
+    },
+    audioButtonPlay: {
+        width:75,
+        height:75,
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+    },
+    audioButtonRewind: {
+        width:50,
+        height:50,
+        marginLeft: 85,
+        marginTop: 25,
+    },
+    audioButtonForward: {
+        width:50,
+        height:50,
+        marginRight: 40,
+        marginTop: 25,
     }
 });
 

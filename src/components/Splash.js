@@ -26,7 +26,7 @@ class Splash extends Component {
         header: {
           visible: null,
         }
-      }
+      };
 
     componentWillMount() {
 
@@ -38,7 +38,7 @@ class Splash extends Component {
 
         if (this.props.episodes != null){
             const { navigate } = this.props.navigation;
-            navigate('MainFlow')
+            navigate('MainFlow');
             return;
         }
 
