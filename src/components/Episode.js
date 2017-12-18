@@ -5,6 +5,7 @@ import {
     TouchableOpacity, Image, Modal, TouchableNativeFeedback,
     Linking, TouchableWithoutFeedback
 } from 'react-native';
+import RNAudioStreamer from 'react-native-audio-streamer';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux';
@@ -147,7 +148,7 @@ class Episode extends Component {
                                                 {video.title}
                                             </Text>
                                             <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
-                                               {video.author}
+                                                {video.author}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -160,8 +161,30 @@ class Episode extends Component {
         }
     }
 
-    playEpisode(){
-        
+    playEpisode() {
+
+        RNAudioStreamer.setUrl(episode.audio_file_url)
+        RNAudioStreamer.play()
+        // RNAudioStreamer.pause()
+        // RNAudioStreamer.seekToTime(16) //seconds
+        // RNAudioStreamer.duration((err, duration) => {
+        //     if (!err) console.log(duration) //seconds
+        // })
+        // RNAudioStreamer.currentTime((err, currentTime) => {
+        //     if (!err) console.log(currentTime) //seconds
+        // })
+
+        // Player Status:
+        // - PLAYING
+        // - PAUSED
+        // - STOPPED
+        // - FINISHED
+        // - BUFFERING
+        // - ERROR
+        RNAudioStreamer.status((err, status) => {
+            if (!err) console.log(status)
+        })
+
     }
 
     render() {

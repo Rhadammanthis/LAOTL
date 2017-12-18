@@ -12,6 +12,7 @@
     "lodash": "^4.17.4",
     "react": "16.0.0-beta.5",
     "react-native": "0.49.3",
+    "react-native-audio-streamer": "0.0.9",
     "react-navigation": "^1.0.0-beta.15",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
