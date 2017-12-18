@@ -3,7 +3,7 @@ import {
     Platform, StyleSheet, Text, View,
     ActivityIndicator, Animated, ScrollView,
     TouchableOpacity, Image, Modal, TouchableNativeFeedback,
-    Linking
+    Linking, TouchableWithoutFeedback
 } from 'react-native';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
@@ -160,6 +160,10 @@ class Episode extends Component {
         }
     }
 
+    playEpisode(){
+        
+    }
+
     render() {
 
         const { goBack } = this.props.navigation;
@@ -194,6 +198,12 @@ class Episode extends Component {
                     {this.renderBooks()}
                     {this.renderMovies()}
                     {this.renderVideos()}
+                    <View style={{ height: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, alignItems: 'center', justifyContent: 'center' }}>
+                        <TouchableWithoutFeedback onPress={this.playEpisode.bind(this)}>
+                            <Image style={{ height: 70, width: 70 }}
+                                source={require('../images/play_circle.png')} />
+                        </TouchableWithoutFeedback>
+                    </View>
                     {/* <View style={{ height: 1000 }} /> */}
                 </ScrollView>
                 {/* Persistent NavBar components */}
