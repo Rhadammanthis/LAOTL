@@ -18,21 +18,47 @@ class Episode extends Component {
 
         episode = this.props.selectedEpisode;
 
+        RNAudioStreamer.setUrl(episode.audio_file_url)
+
     }
 
-    renderAudioPlayer(){
+    renderAudioPlayer() {
         return (
-            <View style={ [styles.audioPlayer] }>
-                <Image style={{ flex: 1, flexDirection: 'row', height: 250, marginTop: 55 }} source={{ uri: this.props.selectedEpisode.image }} />
-                <View style={{ flex: 1, flexDirection: 'row', }}>
-                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}>
-                        <Image source={require('../images/audioPlayer/ic_fast_rewind.png')}/>
+            <View style={{marginBottom: 10}}>
+                <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                    PLAY EPISODE
+                    </Text>
+                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}
+                        onPress={() => {
+                            RNAudioStreamer.currentTime((err, currentTime) => {
+                                if (!err) console.log(currentTime)
+                                RNAudioStreamer.seekToTime(currentTime - 10 < 0 ? 0 : currentTime - 10)
+                            })
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_fast_rewind.png')} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonPlay]}>
-                        <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')}/>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonPlay]}
+                        onPress={() => {
+                            console.log('played')
+                            RNAudioStreamer.status((err, status) => {
+                                console.log('Status', status)
+                                status === 'PLAYING' ? RNAudioStreamer.pause() : RNAudioStreamer.play();
+                            })
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}>
-                        <Image source={require('../images/audioPlayer/ic_fast_forward.png')}/>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}
+                        onPress={() => {
+                            RNAudioStreamer.duration((err, duration) => {
+                                if (!err) console.log(duration) //seconds
+                                RNAudioStreamer.currentTime((err, currentTime) => {
+                                    if (!err) console.log(currentTime)
+                                    RNAudioStreamer.seekToTime(currentTime + 10 > duration ? duration : currentTime + 10)
+                                })
+                            })
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_fast_forward.png')} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -217,16 +243,14 @@ class Episode extends Component {
                     onScroll={(event) => {
                         this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
                     }}>
-
-                    {this.renderAudioPlayer()}
-
-                    <View style={{ flex: 1, flexDirection: 'row',  marginRight: 15, marginTop:35  }}>
+                    <Image style={{ flex: 1, flexDirection: 'row', height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
+                    <View style={{ flex: 1, flexDirection: 'row', marginRight: 15, marginTop: 35 }}>
                         <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
                             {this.props.selectedEpisode.title}
                         </Text>
                         <View style={{ flex: 2, flexDirection: 'row' }}>
                             <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10}}>
+                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
                                 {this.props.selectedEpisode.duration}
                             </Text>
                         </View>
@@ -242,12 +266,7 @@ class Episode extends Component {
                     {this.renderBooks()}
                     {this.renderMovies()}
                     {this.renderVideos()}
-                    <View style={{ height: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, alignItems: 'center', justifyContent: 'center' }}>
-                        <TouchableWithoutFeedback onPress={this.playEpisode.bind(this)}>
-                            <Image style={{ height: 70, width: 70 }}
-                                source={require('../images/play_circle.png')} />
-                        </TouchableWithoutFeedback>
-                    </View>
+                    {this.renderAudioPlayer()}
                     {/* <View style={{ height: 1000 }} /> */}
                 </ScrollView>
                 {/* Persistent NavBar components */}
@@ -331,30 +350,28 @@ const styles = StyleSheet.create({
         minWidth: 400,
     },
     audioButton: {
-        borderWidth:1,
-        borderColor:'rgba(0,0,0,0.2)',
-        borderRadius:100,
-        alignItems:'center',
-        justifyContent:'center',
-        backgroundColor:'#efefef',
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#efefef',
     },
     audioButtonPlay: {
-        width:75,
-        height:75,
+        width: 75,
+        height: 75,
         marginLeft: 10,
         marginRight: 10,
         marginTop: 10,
     },
     audioButtonRewind: {
-        width:50,
-        height:50,
-        marginLeft: 85,
+        width: 50,
+        height: 50,
         marginTop: 25,
     },
     audioButtonForward: {
-        width:50,
-        height:50,
-        marginRight: 40,
+        width: 50,
+        height: 50,
         marginTop: 25,
     }
 });
