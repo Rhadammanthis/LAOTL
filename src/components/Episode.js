@@ -9,7 +9,8 @@ import RNAudioStreamer from 'react-native-audio-streamer';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux';
-import { selectEpisode, toggleNavbarFade } from '../actions'
+import { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio } from '../actions'
+
 
 class Episode extends Component {
 
@@ -17,6 +18,45 @@ class Episode extends Component {
 
         episode = this.props.selectedEpisode;
 
+        // RNAudioStreamer.setUrl(episode.audio_file_url)
+
+    }
+
+    renderAudioPlayer() {
+
+        return (
+            <View style={{marginBottom: 10}}>
+                <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                    PLAY EPISODE
+                    </Text>
+                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}
+                        onPress={() => {
+                            
+                            this.props.rewindAudio()
+
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_fast_rewind.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonPlay]}
+                        onPress={() => {
+
+                            this.props.toggleAudioPlaying(episode, this.props.audioPlaying, this.props.currentEpisodePlaying)
+
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}
+                        onPress={() => {
+                            
+                            this.props.fastForwardAudio()
+
+                        }}>
+                        <Image source={require('../images/audioPlayer/ic_fast_forward.png')} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
     }
 
     renderArticles() {
@@ -197,9 +237,8 @@ class Episode extends Component {
                     onScroll={(event) => {
                         this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
                     }}>
-                    <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
-                    <Transparency size={35} />
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <Image style={{ flex: 1, flexDirection: 'row', height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
+                    <View style={{ flex: 1, flexDirection: 'row', marginRight: 15, marginTop: 35 }}>
                         <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
                             {this.props.selectedEpisode.title}
                         </Text>
@@ -221,12 +260,7 @@ class Episode extends Component {
                     {this.renderBooks()}
                     {this.renderMovies()}
                     {this.renderVideos()}
-                    <View style={{ height: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, alignItems: 'center', justifyContent: 'center' }}>
-                        <TouchableWithoutFeedback onPress={this.playEpisode.bind(this)}>
-                            <Image style={{ height: 70, width: 70 }}
-                                source={require('../images/play_circle.png')} />
-                        </TouchableWithoutFeedback>
-                    </View>
+                    {this.renderAudioPlayer()}
                     {/* <View style={{ height: 1000 }} /> */}
                 </ScrollView>
                 {/* Persistent NavBar components */}
@@ -270,7 +304,7 @@ const styles = StyleSheet.create({
         top: 0,
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
     },
     backButtonImage: {
         height: 25,
@@ -302,16 +336,48 @@ const styles = StyleSheet.create({
         fontSize: 35,
         marginTop: -25,
         marginHorizontal: 10
+    },
+    audioPlayer: {
+        flex: 1,
+        flexDirection: 'column',
+        minHeight: 400,
+        minWidth: 400,
+    },
+    audioButton: {
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#efefef',
+    },
+    audioButtonPlay: {
+        width: 75,
+        height: 75,
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+    },
+    audioButtonRewind: {
+        width: 50,
+        height: 50,
+        marginTop: 25,
+    },
+    audioButtonForward: {
+        width: 50,
+        height: 50,
+        marginTop: 25,
     }
 });
 
-const mapStateToProps = ({ data }) => {
+const mapStateToProps = ({ data, audioPlayer }) => {
 
     const { selectedEpisode, fade } = data;
+    const { audioPlaying, currentEpisodePlaying} = audioPlayer;
 
     return {
-        selectedEpisode, fade
+        selectedEpisode, fade, audioPlaying, currentEpisodePlaying
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade })(Episode)
+export default connect(mapStateToProps, { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio })(Episode)
