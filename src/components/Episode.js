@@ -9,7 +9,7 @@ import RNAudioStreamer from 'react-native-audio-streamer';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux';
-import { selectEpisode, toggleNavbarFade } from '../actions'
+import { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio } from '../actions'
 
 
 class Episode extends Component {
@@ -18,11 +18,12 @@ class Episode extends Component {
 
         episode = this.props.selectedEpisode;
 
-        RNAudioStreamer.setUrl(episode.audio_file_url)
+        // RNAudioStreamer.setUrl(episode.audio_file_url)
 
     }
 
     renderAudioPlayer() {
+
         return (
             <View style={{marginBottom: 10}}>
                 <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
@@ -31,32 +32,25 @@ class Episode extends Component {
                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
                     <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}
                         onPress={() => {
-                            RNAudioStreamer.currentTime((err, currentTime) => {
-                                if (!err) console.log(currentTime)
-                                RNAudioStreamer.seekToTime(currentTime - 10 < 0 ? 0 : currentTime - 10)
-                            })
+                            
+                            this.props.rewindAudio()
+
                         }}>
                         <Image source={require('../images/audioPlayer/ic_fast_rewind.png')} />
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.audioButton, styles.audioButtonPlay]}
                         onPress={() => {
-                            console.log('played')
-                            RNAudioStreamer.status((err, status) => {
-                                console.log('Status', status)
-                                status === 'PLAYING' ? RNAudioStreamer.pause() : RNAudioStreamer.play();
-                            })
+
+                            this.props.toggleAudioPlaying(episode, this.props.audioPlaying, this.props.currentEpisodePlaying)
+
                         }}>
                         <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')} />
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}
                         onPress={() => {
-                            RNAudioStreamer.duration((err, duration) => {
-                                if (!err) console.log(duration) //seconds
-                                RNAudioStreamer.currentTime((err, currentTime) => {
-                                    if (!err) console.log(currentTime)
-                                    RNAudioStreamer.seekToTime(currentTime + 10 > duration ? duration : currentTime + 10)
-                                })
-                            })
+                            
+                            this.props.fastForwardAudio()
+
                         }}>
                         <Image source={require('../images/audioPlayer/ic_fast_forward.png')} />
                     </TouchableOpacity>
@@ -376,13 +370,14 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapStateToProps = ({ data }) => {
+const mapStateToProps = ({ data, audioPlayer }) => {
 
     const { selectedEpisode, fade } = data;
+    const { audioPlaying, currentEpisodePlaying} = audioPlayer;
 
     return {
-        selectedEpisode, fade
+        selectedEpisode, fade, audioPlaying, currentEpisodePlaying
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade })(Episode)
+export default connect(mapStateToProps, { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio })(Episode)
