@@ -6,7 +6,7 @@ import {
 const INITIAL_STATE = { 
     audioPlaying: false,
     currentEpisodePlaying: 0,
-    currentTime: 0
+    currentTime: '0.00'
  };
 
 export default (state = INITIAL_STATE, action) => {

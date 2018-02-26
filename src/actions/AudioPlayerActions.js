@@ -69,3 +69,14 @@ export const fastForwardAudio = (seconds) => {
         })
     }
 }
+
+export const updateCurrentTime = () => {
+
+    return (dispatch) => {
+
+        RNAudioStreamer.duration((err, duration) => {
+            dispatch({type: AUDIO_CURRENT_TIME, payload: duration})  
+        })
+    }
+
+}

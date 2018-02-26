@@ -5,11 +5,12 @@ import {
     TouchableOpacity, Image, Modal, TouchableNativeFeedback,
     Linking, TouchableWithoutFeedback
 } from 'react-native';
+import TimerMixin from 'react-timer-mixin';
 import RNAudioStreamer from 'react-native-audio-streamer';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux';
-import { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio } from '../actions'
+import { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio, updateCurrentTime } from '../actions'
 
 
 class Episode extends Component {
@@ -25,14 +26,14 @@ class Episode extends Component {
     renderAudioPlayer() {
 
         return (
-            <View style={{marginBottom: 10}}>
+            <View style={{ marginBottom: 10 }}>
                 <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
                     PLAY EPISODE
                     </Text>
                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
                     <TouchableOpacity style={[styles.audioButton, styles.audioButtonRewind]}
                         onPress={() => {
-                            
+
                             this.props.rewindAudio()
 
                         }}>
@@ -48,7 +49,7 @@ class Episode extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.audioButton, styles.audioButtonForward]}
                         onPress={() => {
-                            
+
                             this.props.fastForwardAudio()
 
                         }}>
@@ -231,6 +232,11 @@ class Episode extends Component {
 
         const { goBack } = this.props.navigation;
 
+        if(this.props.audioPlaying){
+            console.log('NOW PLAYING')
+            TimerMixin.setInterval(this.props.updateCurrentTime(), 1000)
+        }
+
         return (
             <View style={{ flex: 1 }}>
                 <ScrollView style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
@@ -260,8 +266,9 @@ class Episode extends Component {
                     {this.renderBooks()}
                     {this.renderMovies()}
                     {this.renderVideos()}
-                    {this.renderAudioPlayer()}
+                    {/* {this.renderAudioPlayer()} */}
                     {/* <View style={{ height: 1000 }} /> */}
+                    <View style={{ marginTop: 80 }} />
                 </ScrollView>
                 {/* Persistent NavBar components */}
                 <View style={[styles.navBar, { opacity: this.props.fade, }]}>
@@ -273,6 +280,29 @@ class Episode extends Component {
                     onPress={() => { goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
+                {/* Persistent NavBar components */}
+                <View style={{
+                    height: 70, flex: 1, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, position: 'absolute',
+                    bottom: 0, top: '90%', left: 0, right: 0, paddingBottom: 5, flexDirection: 'row'
+                }}>
+                    <View style={{ flexDirection: 'column', justifyContent: 'center', height: 70, marginLeft: 10 }}>
+                        <TouchableOpacity style={[styles.audioButton, { width: 50, height: 50 }]}
+                            onPress={() => {
+
+                                // console.log('sjould play')
+                                this.props.toggleAudioPlaying(episode, this.props.audioPlaying, this.props.currentEpisodePlaying)
+
+
+                            }}>
+                            <Image source={require('../images/audioPlayer/ic_play_arrow_3x.png')} style={{ width: 50, height: 50 }} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ justifyContent: 'center', flex: 1, marginLeft: 10 }}>
+                        <Text style={{ color: 'white', fontSize: 15 }}>
+                            {this.props.currentTime}
+                        </Text>
+                    </View>
+                </View>
             </View>
 
         )
@@ -373,11 +403,11 @@ const styles = StyleSheet.create({
 const mapStateToProps = ({ data, audioPlayer }) => {
 
     const { selectedEpisode, fade } = data;
-    const { audioPlaying, currentEpisodePlaying} = audioPlayer;
+    const { audioPlaying, currentEpisodePlaying, currentTime } = audioPlayer;
 
     return {
-        selectedEpisode, fade, audioPlaying, currentEpisodePlaying
+        selectedEpisode, fade, audioPlaying, currentEpisodePlaying, currentTime
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio })(Episode)
+export default connect(mapStateToProps, { toggleNavbarFade, toggleAudioPlaying, rewindAudio, fastForwardAudio, updateCurrentTime })(Episode)
