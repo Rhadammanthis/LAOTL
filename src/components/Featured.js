@@ -5,6 +5,7 @@ import {
     TouchableOpacity, Image
 } from 'react-native';
 import { connect } from 'react-redux';
+import { selectEpisode } from '../actions'
 
 class Featured extends Component {
 
@@ -12,6 +13,11 @@ class Featured extends Component {
 
         console.log('From firebase', this.props.episodes)
 
+    }
+
+    onEpisodeSelected(){
+        console.log('Clicked!')
+        this.props.selectEpisode(this.props.episode, this.props.navigate)
     }
 
     render() {
@@ -24,7 +30,7 @@ class Featured extends Component {
         for(let i = newestEpisode; i > lastRecentEpisode; i--){
             
             recentEpisodes.push(  
-                <View key={i} style={ [styles.featureView] }>
+                <TouchableOpacity key={i} style={ [styles.featureView] } onPress={() => { this.props.selectEpisode(mappedEpisodes[i], this.props.navigation.navigate) }}>
                     <View style={{ flex: 1 }}>
                         <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
                             source={{ uri: mappedEpisodes[i].image }}
@@ -43,7 +49,7 @@ class Featured extends Component {
                             </View>
                         </View>
                     </View>
-                </View>
+                </TouchableOpacity>
             )
         }
                 
@@ -119,4 +125,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps)(Featured);
+export default connect(mapStateToProps, { selectEpisode })(Featured);

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import {
     Platform, StyleSheet, Text, View,
-    ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image, Modal, TouchableNativeFeedback,
-    Linking
+    ActivityIndicator, ScrollView, TouchableOpacity,
+    Image, Modal, TouchableNativeFeedback,
+    Linking, Dimensions, Animated, Easing
 } from 'react-native';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
@@ -12,11 +12,18 @@ import { selectEpisode, toggleNavbarFade } from '../actions'
 
 class Episode extends Component {
 
+    state = {
+        animButtonPossition: new Animated.Value(0),
+        animComplete: false,
+        scrollPoss: 0,
+    }
+
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
 
     }
+
 
     renderArticles() {
         if (episode.show_notes && episode.show_notes.articles) {
@@ -147,7 +154,7 @@ class Episode extends Component {
                                                 {video.title}
                                             </Text>
                                             <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
-                                               {video.author}
+                                                {video.author}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -169,6 +176,45 @@ class Episode extends Component {
                 <ScrollView style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
                     onScroll={(event) => {
                         this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
+
+                        var currentOffset = event.nativeEvent.contentOffset.y;
+                        var direction = currentOffset > this.offset ? 'down' : 'up';
+
+                        if (direction === "up" && this.state.animComplete === true) {
+
+                            this.setState({ animComplete: false })
+
+                            Animated.timing(this.state.animButtonPossition, {
+                                toValue: 0,
+                                duration: 700,
+                                easing: Easing.inOut(Easing.exp),
+                            }).start(onComplete = () => {
+                                console.log('Anim complete')
+                            })
+                        }
+
+                        if (direction === "down" && (currentOffset - this.state.scrollPoss) > 60 && this.state.animComplete === false) {
+
+                            this.setState({ animComplete: true })
+
+                            Animated.timing(this.state.animButtonPossition, {
+                                toValue: 1,
+                                duration: 700,
+                                easing: Easing.inOut(Easing.exp),
+                            }).start(onComplete = () => {
+                                console.log('Anim complete')
+                            })
+                        }
+
+                        this.offset = currentOffset;
+
+                        console.log(direction);
+
+                        this.offset = currentOffset;
+                    }} onScrollEndDrag={(event) => {
+                        this.setState({
+                            scrollPoss: event.nativeEvent.contentOffset.y
+                        })
                     }}>
                     <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
                     <Transparency size={35} />
@@ -195,7 +241,26 @@ class Episode extends Component {
                     {this.renderMovies()}
                     {this.renderVideos()}
                     {/* <View style={{ height: 1000 }} /> */}
+
                 </ScrollView>
+                <Animated.View style={[styles.addContent, {
+                    transform: [{
+                        translateY: this.state.animButtonPossition.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [250, 0]
+                        })
+                    }]
+                }]}>
+                    <TouchableNativeFeedback
+                        onPress={() => {
+                            console.log('Start anim')
+
+                        }}>
+                        <View style={[ { flex: 1, alignItems: 'center', justifyContent: 'center' } ]}>
+                            <Image style={styles.addContentImage} source={require('../images/add_white.png')} />
+                        </View>
+                    </TouchableNativeFeedback>
+                </Animated.View>
                 {/* Persistent NavBar components */}
                 <View style={[styles.navBar, { opacity: this.props.fade, }]}>
                     <Text style={styles.navBarTitle} numberOfLines={1}>
@@ -231,6 +296,19 @@ const styles = StyleSheet.create({
         color: Constants.COLOR.MUTE_ORANGE,
         fontWeight: 'bold',
         marginLeft: 35
+    },
+    addContent: {
+        position: 'absolute',
+        right: 10,
+        bottom: 10,
+        borderRadius: 60,
+        height: 60,
+        width: 60,
+        backgroundColor: Constants.COLOR.BRIGHT_ORANGE
+    },
+    addContentImage: {
+        height: 40,
+        width: 40
     },
     backButton: {
         position: 'absolute',
