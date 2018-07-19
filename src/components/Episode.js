@@ -272,7 +272,7 @@ class Episode extends Component {
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
             </View>
-
+            
         )
     }
 }
