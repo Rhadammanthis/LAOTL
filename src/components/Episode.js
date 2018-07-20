@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import {
-    Platform, StyleSheet, Text, View,
-    ActivityIndicator, ScrollView, TouchableOpacity,
-    Image, Modal, TouchableNativeFeedback,
-    Linking, Dimensions, Animated, Easing
+    StyleSheet, Text, View,
+    TouchableOpacity,
+    Image, TouchableNativeFeedback,
+    Linking, Animated, Easing, SectionList
 } from 'react-native';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
+import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
 import { selectEpisode, toggleNavbarFade } from '../actions'
 
 class Episode extends Component {
@@ -16,12 +17,25 @@ class Episode extends Component {
         animButtonPossition: new Animated.Value(0),
         animComplete: false,
         scrollPoss: 0,
+        sectionsData: []
     }
+
+    sectionsData = []
 
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
 
+        for (var key in episode.show_notes) {
+            if (episode.show_notes.hasOwnProperty(key)) {
+                console.log("KEYS", key)
+                this.sectionsData.push({
+                    key: key,
+                    data: episode.show_notes[key],
+                    renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
+                })
+            }
+        }
     }
 
 
@@ -119,7 +133,7 @@ class Episode extends Component {
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
-                                );
+                                )
                             })
                         }
                     </View>
@@ -158,7 +172,7 @@ class Episode extends Component {
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
-                                );
+                                )
                             })
                         }
                     </View>
@@ -167,83 +181,192 @@ class Episode extends Component {
         }
     }
 
+    // _renderItem = ({ item, section }) => (<Text style={{ color: 'orange' }}>{`(${section.key})`}</Text>)
+
+    renderHeader = () => {
+
+        return (
+            <View>
+                <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
+                <Transparency size={35} />
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
+                        {this.props.selectedEpisode.title}
+                    </Text>
+                    <View style={{ flex: 2, flexDirection: 'row' }}>
+                        <Image style={styles.icon} source={require('../images/clock.png')} />
+                        <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
+                            {this.props.selectedEpisode.duration}
+                        </Text>
+                    </View>
+                </View>
+                <Text style={styles.description}>
+                    {this.props.selectedEpisode.description}
+                </Text>
+                <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
+                    Show Notes
+                    </Text>
+            </View>
+        );
+    };
+
+    onListScroll = (event) => {
+        this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
+
+        var currentOffset = event.nativeEvent.contentOffset.y;
+        var direction = currentOffset > this.offset ? 'down' : 'up';
+
+        if (direction === "up" && this.state.animComplete === true) {
+
+            this.setState({ animComplete: false })
+
+            Animated.timing(this.state.animButtonPossition, {
+                toValue: 0,
+                duration: 700,
+                easing: Easing.inOut(Easing.exp),
+            }).start(onComplete = () => {
+                console.log('Anim complete')
+            })
+        }
+
+        if (direction === "down" && (currentOffset - this.state.scrollPoss) > 60 && this.state.animComplete === false) {
+
+            this.setState({ animComplete: true })
+
+            Animated.timing(this.state.animButtonPossition, {
+                toValue: 1,
+                duration: 700,
+                easing: Easing.inOut(Easing.exp),
+            }).start(onComplete = () => {
+                console.log('Anim complete')
+            })
+        }
+
+        this.offset = currentOffset;
+
+    }
+
+    renderSectionHeader = (section) => {
+        return (
+            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                {section.key.toUpperCase()}
+            </Text>
+        )
+    }
+
+    selectItemRenderer = (item, section) => {
+
+        switch (section.key) {
+            case "articles":
+                return <ArticleListItem item={item} />
+            case "books":
+                return <BookListItem item={item} />
+            case "movies":
+                return <MovieListItem item={item} />
+            case "videos":
+                return  <VideoListItem item={item} />
+
+            default:
+                return null
+        }
+    }
+
     render() {
 
         const { goBack } = this.props.navigation;
 
+        // var sectionsData = []
+
+
+
+        //console.log("DAATA", this.state.sectionsData)
+
+
+
+        // const sectionsData = [
+        //     {
+        //         key: 'New',
+        //         data: [
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' }
+        //         ],
+        //         renderItem: ({ item }) => <View><Text style={{ color: 'orange' }}>{item.name}</Text></View>
+        //     },
+        //     {
+        //         key: 'Old',
+        //         data: [
+        //             { name: 'Foo3' },
+        //             { name: 'Foo4' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo2' },
+        //             { name: 'Foo1' },
+        //             { name: 'Foo2' }
+        //         ]
+        //     }
+        // ]
+
         return (
             <View style={{ flex: 1 }}>
-                <ScrollView style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
-                    onScroll={(event) => {
-                        this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
-
-                        var currentOffset = event.nativeEvent.contentOffset.y;
-                        var direction = currentOffset > this.offset ? 'down' : 'up';
-
-                        if (direction === "up" && this.state.animComplete === true) {
-
-                            this.setState({ animComplete: false })
-
-                            Animated.timing(this.state.animButtonPossition, {
-                                toValue: 0,
-                                duration: 700,
-                                easing: Easing.inOut(Easing.exp),
-                            }).start(onComplete = () => {
-                                console.log('Anim complete')
-                            })
-                        }
-
-                        if (direction === "down" && (currentOffset - this.state.scrollPoss) > 60 && this.state.animComplete === false) {
-
-                            this.setState({ animComplete: true })
-
-                            Animated.timing(this.state.animButtonPossition, {
-                                toValue: 1,
-                                duration: 700,
-                                easing: Easing.inOut(Easing.exp),
-                            }).start(onComplete = () => {
-                                console.log('Anim complete')
-                            })
-                        }
-
-                        this.offset = currentOffset;
-
-                        console.log(direction);
-
-                        this.offset = currentOffset;
-                    }} onScrollEndDrag={(event) => {
-                        this.setState({
-                            scrollPoss: event.nativeEvent.contentOffset.y
-                        })
-                    }}>
-                    <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
-                    <Transparency size={35} />
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                        <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
-                            {this.props.selectedEpisode.title}
-                        </Text>
-                        <View style={{ flex: 2, flexDirection: 'row' }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
-                                {this.props.selectedEpisode.duration}
-                            </Text>
-                        </View>
-                    </View>
-                    <Text style={styles.description}>
-                        {this.props.selectedEpisode.description}
+                <SectionList
+                    onScroll={this.onListScroll}
+                    style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
+                    ListHeaderComponent={this.renderHeader}
+                    renderSectionHeader= {({ section }) => this.renderSectionHeader(section)}
+                    keyExtractor={(item) => item.title}
+                    sections={this.sectionsData}>
+                </SectionList>
+                <View style={[styles.navBar, { opacity: this.props.fade, }]}>
+                    <Text style={styles.navBarTitle} numberOfLines={1}>
+                        {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
                     </Text>
-                    <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
-                    <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
-                        Show Notes
-                    </Text>
-                    {this.renderArticles()}
-                    {this.renderBooks()}
-                    {this.renderMovies()}
-                    {this.renderVideos()}
-                    {/* <View style={{ height: 1000 }} /> */}
+                </View>
+                <TouchableNativeFeedback style={styles.backButton}
+                    onPress={() => { goBack() }}>
+                    <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
+                </TouchableNativeFeedback>
+            </View>
 
-                </ScrollView>
-                <Animated.View style={[styles.addContent, {
+        )
+    }
+}
+
+//FAB
+{/* <Animated.View style={[styles.addContent, {
                     transform: [{
                         translateY: this.state.animButtonPossition.interpolate({
                             inputRange: [0, 1],
@@ -256,26 +379,11 @@ class Episode extends Component {
                             console.log('Start anim')
 
                         }}>
-                        <View style={[ { flex: 1, alignItems: 'center', justifyContent: 'center' } ]}>
+                        <View style={[{ flex: 1, alignItems: 'center', justifyContent: 'center' }]}>
                             <Image style={styles.addContentImage} source={require('../images/add_white.png')} />
                         </View>
                     </TouchableNativeFeedback>
-                </Animated.View>
-                {/* Persistent NavBar components */}
-                <View style={[styles.navBar, { opacity: this.props.fade, }]}>
-                    <Text style={styles.navBarTitle} numberOfLines={1}>
-                        {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
-                    </Text>
-                </View>
-                <TouchableNativeFeedback style={styles.backButton}
-                    onPress={() => { goBack() }}>
-                    <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
-                </TouchableNativeFeedback>
-            </View>
-            
-        )
-    }
-}
+                </Animated.View> */}
 
 const styles = StyleSheet.create({
     navBar: {
