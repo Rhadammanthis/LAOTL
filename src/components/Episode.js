@@ -5,6 +5,8 @@ import {
     Image, TouchableNativeFeedback,
     Linking, Animated, Easing, SectionList
 } from 'react-native';
+import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux'
@@ -25,6 +27,8 @@ class Episode extends Component {
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
+
+        console.log('Firebase Id', this.props.navigation.state.params.firebaseId)
 
         for (var key in episode.show_notes) {
             if (episode.show_notes.hasOwnProperty(key)) {
@@ -75,6 +79,7 @@ class Episode extends Component {
     }
 
     onListScroll = (event) => {
+
         this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
 
         var currentOffset = event.nativeEvent.contentOffset.y;
@@ -120,16 +125,19 @@ class Episode extends Component {
             case "movies":
                 return <MovieListItem item={item} />
             case "videos":
-                return  <VideoListItem item={item} />
+                return <VideoListItem item={item} />
 
             default:
                 return null
         }
     }
 
-    render() {
+    addNewContent(type) {
+        const { navigate } = this.props.navigation;
+        navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
+    }
 
-        const { goBack } = this.props.navigation;
+    render() {
 
         return (
             <View style={{ flex: 1 }}>
@@ -137,7 +145,7 @@ class Episode extends Component {
                     onScroll={this.onListScroll}
                     style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
                     ListHeaderComponent={this.renderListHeader}
-                    renderSectionHeader= {({ section }) => this.renderSectionHeader(section)}
+                    renderSectionHeader={({ section }) => this.renderSectionHeader(section)}
                     keyExtractor={(item) => item.title}
                     sections={this.sectionsData}>
                 </SectionList>
@@ -147,34 +155,32 @@ class Episode extends Component {
                     </Text>
                 </View>
                 <TouchableNativeFeedback style={styles.backButton}
-                    onPress={() => { goBack() }}>
+                    onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
+                <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent("video") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-play" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent("movie") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-film" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent("book") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-book" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent("article") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-document" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                </ActionButton>
             </View>
 
         )
     }
 }
-
-//FAB
-{/* <Animated.View style={[styles.addContent, {
-                    transform: [{
-                        translateY: this.state.animButtonPossition.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [250, 0]
-                        })
-                    }]
-                }]}>
-                    <TouchableNativeFeedback
-                        onPress={() => {
-                            console.log('Start anim')
-
-                        }}>
-                        <View style={[{ flex: 1, alignItems: 'center', justifyContent: 'center' }]}>
-                            <Image style={styles.addContentImage} source={require('../images/add_white.png')} />
-                        </View>
-                    </TouchableNativeFeedback>
-                </Animated.View> */}
 
 const styles = StyleSheet.create({
     navBar: {
@@ -246,7 +252,12 @@ const styles = StyleSheet.create({
         fontSize: 35,
         marginTop: -25,
         marginHorizontal: 10
-    }
+    },
+    actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    },
 });
 
 const mapStateToProps = ({ data }) => {

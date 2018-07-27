@@ -22,7 +22,11 @@ class Featured extends Component {
 
     render() {
 
-        var mappedEpisodes = Object.keys(this.props.episodes).map((x) => { return this.props.episodes[x] })
+        var mappedEpisodes = Object.keys(this.props.episodes).map((x) => { 
+            var firebaseId = x;
+            this.props.episodes[x].firebaseId = firebaseId
+            return this.props.episodes[x] }
+        )
         let newestEpisode = mappedEpisodes.length - 1;
         let lastRecentEpisode = mappedEpisodes.length - 7;
         let recentEpisodes = [];
@@ -30,7 +34,7 @@ class Featured extends Component {
         for(let i = newestEpisode; i > lastRecentEpisode; i--){
             
             recentEpisodes.push(  
-                <TouchableOpacity key={i} style={ [styles.featureView] } onPress={() => { this.props.selectEpisode(mappedEpisodes[i], this.props.navigation.navigate) }}>
+                <TouchableOpacity key={i} style={ [styles.featureView] } onPress={() => { this.props.selectEpisode(mappedEpisodes[i], mappedEpisodes[i].firebaseId, this.props.navigation.navigate) }}>
                     <View style={{ flex: 1 }}>
                         <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
                             source={{ uri: mappedEpisodes[i].image }}

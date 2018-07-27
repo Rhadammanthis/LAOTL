@@ -2,7 +2,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+        <item name="colorAccent">#F6502C</item>
+        <item name="colorControlActivated">#F6502C</item>
     </style>
 
 </resources>
