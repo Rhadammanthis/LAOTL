@@ -1,7 +1,8 @@
 import {
     NEW_CONTENT_SEARCH,
     NEW_CONTENT_DATA,
-    NEW_CONETNT_ADDED
+    NEW_CONETNT_ADDED,
+    CLEAR_NEW_CONTENT_VALUES
 } from './types'
 import axios from 'axios'
 
@@ -13,6 +14,12 @@ import axios from 'axios'
 //         payload: episode
 //     };
 // };
+
+export const clearNewContentValues = () =>{
+    return{
+        type: CLEAR_NEW_CONTENT_VALUES
+    }
+}
 
 export const addNewContent = (type, content, episodeId, show_notes) => {
 

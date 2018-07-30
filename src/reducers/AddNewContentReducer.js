@@ -1,12 +1,13 @@
 import {
     NEW_CONTENT_SEARCH,
     NEW_CONTENT_DATA,
-    NEW_CONETNT_ADDED
+    NEW_CONETNT_ADDED,
+    CLEAR_NEW_CONTENT_VALUES
 } from '../actions/types';
 
 const INITIAL_STATE = {
-    searchText: "15613",
-    searchResult: {},
+    searchText: "",
+    searchResult: {content: null},
     contentAddedResponse: {}
 };
 
@@ -15,9 +16,12 @@ export default (state = INITIAL_STATE, action) => {
         case NEW_CONTENT_SEARCH:
             return { ...state, searchText: action.payload };
         case NEW_CONTENT_DATA:
-            return { ...state, searchResult: action.payload }
+        //The call to random() is a hacky way of making sure that the state will "always" be different
+            return { ...state, searchResult: { content: action.payload, res_code: Math.random() } }
         case NEW_CONETNT_ADDED:
             return { ...state, contentAddedResponse: action.payload }
+        case CLEAR_NEW_CONTENT_VALUES:
+            return { ...INITIAL_STATE }
         default:
             return state;
     }

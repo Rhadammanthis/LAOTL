@@ -3,7 +3,7 @@ import {
     StyleSheet, Text, TextInput, View,
     Alert, TouchableNativeFeedback,
     Image, Button, ActivityIndicator,
-    ScrollView
+    ScrollView, Keyboard
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Constants from './common/Constants'
@@ -16,13 +16,10 @@ class AddNew extends Component {
         search: 0
     }
 
-    contentType = ""
-    firebaseId = ""
+    // contentType = ""
+    // firebaseId = ""
 
     componentWillMount() {
-
-        episode = this.props.selectedEpisode;
-        console.log('Type', this.props.contentType)
 
         const { contentType, firebaseId } = this.props.navigation.state.params;
         this.contentType = contentType;
@@ -41,26 +38,34 @@ class AddNew extends Component {
     }
 
     searchForNewContent() {
+
+        Keyboard.dismiss()
+
         this.props.searchContent("movie", this.props.searchText)
         this.setState({ search: 1 })
     }
 
     addNewContent() {
 
-        console.log("Should add new content")
+        console.log("Should add new content", this.props.searchResult)
 
-        var content = { movie_id: this.props.searchResult.id }
+        if (this.props.searchResult === null || this.props.searchResult.content === null){
+            Alert.alert("Alert", "No new content loaded!")}
+        else {
+            switch (this.contentType) {
+                case "movie":
+                    var content = { movie_id: this.props.searchResult.content.id }
+                    break;
+            }
 
-        this.props.addNewContent(
-            this.contentType,
-            content,
-            this.firebaseId,
-            this.props.selectedEpisode.show_notes
-        )
+            this.props.addNewContent(
+                this.contentType,
+                content,
+                this.firebaseId,
+                this.props.selectedEpisode.show_notes
+            )
+        }
 
-        // {
-        //     "video_id": "AJLHsXw-LFI"
-        // }
     }
 
     renderContentState() {
@@ -86,19 +91,19 @@ class AddNew extends Component {
             case 2:
                 switch (this.contentType) {
                     case "movie":
-                        if (this.props.searchResult != null)
+                        if (this.props.searchResult.content !== null)
                             return (
                                 <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
                                     <View style={{ marginRight: 10 }}>
-                                        <Image style={{ height: 300, width: 200 }} source={{ uri: "https://image.tmdb.org/t/p/original" + this.props.searchResult.poster_path }} />
+                                        <Image style={{ height: 300, width: 200 }} source={{ uri: "https://image.tmdb.org/t/p/original" + this.props.searchResult.content.poster_path }} />
                                     </View>
                                     <View style={{ height: StyleSheet.hairlineWidth, width: 300, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
                                     <View>
-                                        <Text style={{ color: 'white', fontSize: 20 }}> {this.props.searchResult.title} ({this.props.searchResult.release_date.slice(0, 4)}) </Text>
+                                        <Text style={{ color: 'white', fontSize: 20 }}> {this.props.searchResult.content.title} ({this.props.searchResult.content.release_date.slice(0, 4)}) </Text>
                                     </View>
                                 </View>
                             )
-                    default:
+                    default:      
                         return (
                             <View style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
                                 <View style={{ height: 1, width: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
@@ -115,7 +120,7 @@ class AddNew extends Component {
     getNoContentMessage() {
         switch (this.contentType) {
             case "movie":
-                return "Movie id not found or corrupt url 😞"
+                return "Movie id not found 😞"
             default:
                 return "Something went wrong 😞"
         }
@@ -163,7 +168,7 @@ class AddNew extends Component {
                     </ScrollView>
                     <Button
                         title="Add content"
-                        onPress={() => {this.addNewContent()}}
+                        onPress={() => { this.addNewContent() }}
                         style={{ marginVertical: 10, height: 100 }}
                         color={Constants.COLOR.BRIGHT_ORANGE}
                         accessibilityLabel="Learn more about this purple button"

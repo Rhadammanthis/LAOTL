@@ -11,7 +11,7 @@ import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
-import { selectEpisode, toggleNavbarFade } from '../actions'
+import { selectEpisode, toggleNavbarFade, clearNewContentValues } from '../actions'
 
 class Episode extends Component {
 
@@ -133,7 +133,10 @@ class Episode extends Component {
     }
 
     addNewContent(type) {
-        const { navigate } = this.props.navigation;
+
+        this.props.clearNewContentValues()
+
+        const { navigate } = this.props.navigation
         navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
     }
 
@@ -269,4 +272,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade })(Episode)
+export default connect(mapStateToProps, { toggleNavbarFade, clearNewContentValues })(Episode)

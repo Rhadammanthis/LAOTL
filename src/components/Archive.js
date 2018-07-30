@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Platform, StyleSheet, Text, View,
-    ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image
+    StyleSheet, View,
+    ScrollView
 } from 'react-native';
 import { connect } from 'react-redux';
 import EpisodeListItem from './EpisodeListItem';
@@ -38,10 +37,6 @@ class Archive extends Component {
 
 }
 
-const styles = StyleSheet.create({
-    
-    });
-
 const mapStateToProps = ({ data }) => {
 
     const { episodes } = data;
@@ -53,4 +48,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps)(Archive);
+export default connect(mapStateToProps, {})(Archive);

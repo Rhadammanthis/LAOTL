@@ -8,6 +8,7 @@ export const FADE_NAVBAR = "fade_navbar";
 export const NEW_CONTENT_SEARCH = "new_content_search";
 export const NEW_CONTENT_DATA = "new_content_data"
 export const NEW_CONETNT_ADDED = "add_new_conetnt"
+export const CLEAR_NEW_CONTENT_VALUES = "clear_new_content_values"
 // export const RESET_MOVIE_DETAIL_STATE = 'reset_movie_detail_state';
 // export const GET_MOVIE_MEDIA_SIZE = "get_movie_media_size";
 // export const ARTIST_CHANGED = 'artist_changed';
