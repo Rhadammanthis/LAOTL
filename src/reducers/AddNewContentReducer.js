@@ -2,13 +2,16 @@ import {
     NEW_CONTENT_SEARCH,
     NEW_CONTENT_DATA,
     NEW_CONETNT_ADDED,
-    CLEAR_NEW_CONTENT_VALUES
+    CLEAR_NEW_CONTENT_VALUES,
+    CHANGE_RESPONSE_COLOR
 } from '../actions/types';
+import {COLOR} from "../components/common/Constants"
 
 const INITIAL_STATE = {
     searchText: "",
     searchResult: {content: null},
-    contentAddedResponse: {}
+    contentAddedResponse: null,
+    responseColor: COLOR.BRIGHT_ORANGE
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -19,9 +22,12 @@ export default (state = INITIAL_STATE, action) => {
         //The call to random() is a hacky way of making sure that the state will "always" be different
             return { ...state, searchResult: { content: action.payload, res_code: Math.random() } }
         case NEW_CONETNT_ADDED:
-            return { ...state, contentAddedResponse: action.payload }
+            return { ...state, contentAddedResponse: action.payload, 
+                responseColor: action.payload.status === 200 ? COLOR.GREEN : COLOR.RED }
         case CLEAR_NEW_CONTENT_VALUES:
             return { ...INITIAL_STATE }
+        case CHANGE_RESPONSE_COLOR:
+            return { ...state, responseColor: action.payload}
         default:
             return state;
     }

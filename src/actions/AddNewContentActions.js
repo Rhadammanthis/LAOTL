@@ -2,7 +2,8 @@ import {
     NEW_CONTENT_SEARCH,
     NEW_CONTENT_DATA,
     NEW_CONETNT_ADDED,
-    CLEAR_NEW_CONTENT_VALUES
+    CLEAR_NEW_CONTENT_VALUES,
+    CHANGE_RESPONSE_COLOR
 } from './types'
 import axios from 'axios'
 
@@ -38,7 +39,7 @@ export const addNewContent = (type, content, episodeId, show_notes) => {
         axios.post('https://radiant-eyrie-44862.herokuapp.com/laotl/addContent', data)
             .then((response) => {
                 console.log(response);
-                dispatch({ type: NEW_CONETNT_ADDED, payload: data });
+                dispatch({ type: NEW_CONETNT_ADDED, payload: response });
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -79,5 +80,12 @@ export const searchContent = (type, query) => {
 
 
 
+    }
+}
+
+export const changeResponseColor = (color) => {
+    return{
+        type: CHANGE_RESPONSE_COLOR,
+        payload: color
     }
 }
