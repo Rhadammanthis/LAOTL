@@ -33,7 +33,8 @@ export const doSerach = (episodes, textToSearch) => {
                     for(var i = 0; i < textItems.length; i++){
                         for(var j = 0; j < labelItems.length; j++){
                             if(levenshtein(labelItems[j], textItems[i]) <= 1){
-                                matches.push(episodes[x])
+                                if(!matches.includes(episodes[x]))
+                                    matches.push(episodes[x])
                                 break;
                             }
                         }

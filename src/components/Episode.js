@@ -1,211 +1,162 @@
 import React, { Component } from 'react';
 import {
-    Platform, StyleSheet, Text, View,
-    ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image, Modal, TouchableNativeFeedback,
-    Linking
+    StyleSheet, Text, View,
+    Image, TouchableNativeFeedback,
+    SectionList, Animated, Platform
 } from 'react-native';
+import ActionButton from 'react-native-action-button';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
 import Constants from './common/Constants'
-import { connect } from 'react-redux';
-import { selectEpisode, toggleNavbarFade } from '../actions'
+import { connect } from 'react-redux'
+import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
+import { clearNewContentValues } from '../actions'
+
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
 class Episode extends Component {
+
+    state = {
+        scrollPoss: 0,
+        sectionsData: [],
+        scrollY: new Animated.Value(0)
+    }
+
+    sectionsData = []
 
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
 
-    }
+        console.log('Firebase Id', this.props.navigation.state.params.firebaseId)
 
-    renderArticles() {
-        if (episode.show_notes && episode.show_notes.articles) {
-            return (
-                <View>
-                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
-                        ARTICLES
-                    </Text>
-                    <View>
-                        {
-                            episode.show_notes.articles.map((article, i) => {
-                                return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }} onPress={() => { Linking.openURL(article.url) }}>
-                                        <View style={{ flex: 1, flexDirection: 'column' }}>
-                                            <Image style={[styles.icon, { marginTop: 0 }]} source={require('../images/article.png')} />
-                                        </View>
-                                        <View style={{ flex: 7 }}>
-                                            <Text style={{ fontSize: 20, color: 'white' }}>
-                                                {article.title}
-                                            </Text>
-                                            <Text style={{ alignSelf: 'flex-start', fontSize: 10, color: 'white' }}>
-                                                by {article.source}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        }
-                    </View>
-                </View>
-            )
+        for (var key in episode.show_notes) {
+            if (episode.show_notes.hasOwnProperty(key)) {
+                console.log("KEYS", key)
+                this.sectionsData.push({
+                    key: key,
+                    data: episode.show_notes[key],
+                    renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
+                })
+            }
         }
     }
 
-    renderBooks() {
-        if (episode.show_notes && episode.show_notes.books) {
-            return (
-                <View style={{ marginTop: 10 }}>
-                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
-                        BOOKS
-                    </Text>
-                    <View>
-                        {
-                            episode.show_notes.books.map((book, i) => {
-                                return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }} onPress={() => { Linking.openURL(book.amazon_link) }}>
-                                        <View style={{ flex: 2, marginRight: 10 }}>
-                                            <Image resizeMode={'contain'} style={{ height: 130 }} source={{ uri: book.cover }} />
-                                        </View>
-                                        <View style={{ flex: 7 }}>
-                                            <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>
-                                                {book.title}
-                                            </Text>
-                                            <Text style={{ alignSelf: 'flex-start', fontSize: 12, color: 'white' }}>
-                                                by {book.author}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        }
+    renderListHeader = () => {
+
+        return (
+            <View>
+                <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
+                <Transparency size={35} />
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <Animated.Text style={[styles.title, {  }]}>
+                        {this.props.selectedEpisode.title}
+                    </Animated.Text>
+                    <View style={{ flex: 2, flexDirection: 'row' }}>
+                        <Image style={styles.icon} source={require('../images/clock.png')} />
+                        <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
+                            {this.props.selectedEpisode.duration}
+                        </Text>
                     </View>
                 </View>
-            )
+                <Text style={styles.description}>
+                    {this.props.selectedEpisode.description}
+                </Text>
+                <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
+                    Show Notes
+                    </Text>
+            </View>
+        );
+    };
+
+    renderSectionHeader = (section) => {
+        return (
+            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+                {section.key.toUpperCase()}
+            </Text>
+        )
+    }
+
+    selectItemRenderer = (item, section) => {
+
+        switch (section.key) {
+            case "articles":
+                return <ArticleListItem item={item} />
+            case "books":
+                return <BookListItem item={item} />
+            case "movies":
+                return <MovieListItem item={item} />
+            case "videos":
+                return <VideoListItem item={item} />
+
+            default:
+                return null
         }
     }
 
-    renderMovies() {
-        if (episode.show_notes && episode.show_notes.movies) {
-            return (
-                <View style={{ marginTop: 10 }}>
-                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
-                        MOVIES & DOCS
-                    </Text>
-                    <View>
-                        {
-                            episode.show_notes.movies.map((movie, i) => {
-                                return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }}
-                                        onPress={() => { Linking.openURL(`https://www.themoviedb.org/movie/${movie.id}`) }}>
-                                        <View style={{ flex: 2, marginRight: 10 }}>
-                                            <Image resizeMode={'contain'} style={{ height: 130 }} source={{ uri: movie.poster }} />
-                                        </View>
-                                        <View style={{ flex: 7 }}>
-                                            <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>
-                                                {movie.title}
-                                            </Text>
-                                            <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
-                                                Directed by {movie.director}
-                                            </Text>
-                                            <Text style={{ alignSelf: 'flex-start', fontSize: 12, color: 'white' }}>
-                                                {movie.release_date}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        }
-                    </View>
-                </View>
-            )
-        }
-    }
+    addNewContent(type) {
 
-    renderVideos() {
-        if (episode.show_notes && episode.show_notes.videos) {
-            return (
-                <View style={{ marginTop: 10 }}>
-                    <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
-                        VIDEOS
-                    </Text>
-                    <View>
-                        {
-                            episode.show_notes.videos.map((video, i) => {
-                                return (
-                                    <TouchableOpacity key={i} style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }}
-                                        onPress={() => { Linking.openURL(video.url) }}>
-                                        <View style={{ flex: 4, marginRight: 10, alignItems: 'center', justifyContent: 'center' }}>
-                                            <Image style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                                                source={{ uri: video.thumb_nail }} resizeMode={'contain'} />
-                                            <View style={{ opacity: 1 }}>
-                                                <Image style={{ height: 40, width: 40 }}
-                                                    source={require('../images/play_circle.png')} />
-                                            </View>
-                                        </View>
-                                        <View style={{ flex: 6, height: 100 }}>
-                                            <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>
-                                                {video.title}
-                                            </Text>
-                                            <Text style={{ alignSelf: 'flex-start', fontSize: 13, color: 'white' }}>
-                                               {video.author}
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                );
-                            })
-                        }
-                    </View>
-                </View>
-            )
-        }
+        this.props.clearNewContentValues()
+
+        const { navigate } = this.props.navigation
+        navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
     }
 
     render() {
 
-        const { goBack } = this.props.navigation;
+        const animFade =  Animated.event(
+            [{
+                nativeEvent: { contentOffset: { y: this.state.scrollY } }
+            }],
+            {
+                useNativeDriver: true
+            }
+        )
+
+        var headerFade = this.state.scrollY.interpolate({
+            inputRange: [175, 254, 255],
+            outputRange: [0, 0.9, 1],
+            extrapolate: 'clamp'
+        });
 
         return (
             <View style={{ flex: 1 }}>
-                <ScrollView style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
-                    onScroll={(event) => {
-                        this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
-                    }}>
-                    <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
-                    <Transparency size={35} />
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                        <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
-                            {this.props.selectedEpisode.title}
-                        </Text>
-                        <View style={{ flex: 2, flexDirection: 'row' }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
-                                {this.props.selectedEpisode.duration}
-                            </Text>
-                        </View>
-                    </View>
-                    <Text style={styles.description}>
-                        {this.props.selectedEpisode.description}
-                    </Text>
-                    <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
-                    <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
-                        Show Notes
-                    </Text>
-                    {this.renderArticles()}
-                    {this.renderBooks()}
-                    {this.renderMovies()}
-                    {this.renderVideos()}
-                    {/* <View style={{ height: 1000 }} /> */}
-                </ScrollView>
-                {/* Persistent NavBar components */}
-                <View style={[styles.navBar, { opacity: this.props.fade, }]}>
-                    <Text style={styles.navBarTitle} numberOfLines={1}>
+                <AnimatedSectionList
+                    onScroll={animFade}
+                    style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
+                    ListHeaderComponent={this.renderListHeader(headerFade)}
+                    renderSectionHeader={({ section }) => this.renderSectionHeader(section)}
+                    keyExtractor={(item) => item.title}
+                    sections={this.sectionsData}>
+                </AnimatedSectionList>
+                <Animated.View style={[styles.navBar, { opacity: headerFade }]}>
+                    <Animated.Text style={[styles.navBarTitle, { opacity: headerFade }]} numberOfLines={1}>
                         {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
-                    </Text>
-                </View>
+                    </Animated.Text>
+                </Animated.View>
                 <TouchableNativeFeedback style={styles.backButton}
-                    onPress={() => { goBack() }}>
+                    onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
+                <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent("video") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-play" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent("movie") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-film" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent("book") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-book" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent("article") }} textStyle={{ color: "white", fontSize: 15 }}
+                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                        <Icon name="md-document" style={styles.actionButtonIcon} />
+                    </ActionButton.Item>
+                </ActionButton>
             </View>
 
         )
@@ -231,6 +182,19 @@ const styles = StyleSheet.create({
         color: Constants.COLOR.MUTE_ORANGE,
         fontWeight: 'bold',
         marginLeft: 35
+    },
+    addContent: {
+        position: 'absolute',
+        right: 10,
+        bottom: 10,
+        borderRadius: 60,
+        height: 60,
+        width: 60,
+        backgroundColor: Constants.COLOR.BRIGHT_ORANGE
+    },
+    addContentImage: {
+        height: 40,
+        width: 40
     },
     backButton: {
         position: 'absolute',
@@ -269,7 +233,12 @@ const styles = StyleSheet.create({
         fontSize: 35,
         marginTop: -25,
         marginHorizontal: 10
-    }
+    },
+    actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    },
 });
 
 const mapStateToProps = ({ data }) => {
@@ -281,4 +250,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade })(Episode)
+export default connect(mapStateToProps, { clearNewContentValues })(Episode)

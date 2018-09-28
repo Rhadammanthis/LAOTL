@@ -10,12 +10,11 @@ import { selectEpisode } from '../actions'
 class EpisodeListItem extends Component {
 
     componentWillMount() {
-
     }
 
     onEpisodeSelected(){
         console.log('Clicked!')
-        this.props.selectEpisode(this.props.episode, this.props.navigate)
+        this.props.selectEpisode(this.props.episode, this.props.firebaseId, this.props.navigate)
     }
 
     render() {

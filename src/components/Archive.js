@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Platform, StyleSheet, Text, View,
-    ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image
+    StyleSheet, View,
+    ScrollView
 } from 'react-native';
 import { connect } from 'react-redux';
 import EpisodeListItem from './EpisodeListItem';
@@ -20,7 +19,7 @@ class Archive extends Component {
         const { navigate } = this.props.navigation;
 
         return Object.keys(this.props.episodes).slice(0, 10).map((i) => (
-            <EpisodeListItem key={i} episode={this.props.episodes[i]} navigate={navigate} />
+            <EpisodeListItem key={i} episode={this.props.episodes[i]} navigate={navigate} firebaseId={i} />
         ))
 
     }
@@ -38,17 +37,15 @@ class Archive extends Component {
 
 }
 
-const styles = StyleSheet.create({
-    
-    });
-
 const mapStateToProps = ({ data }) => {
 
     const { episodes } = data;
+
+    console.log('#################', episodes)
 
     return {
         episodes
     };
 };
 
-export default connect(mapStateToProps)(Archive);
+export default connect(mapStateToProps, {})(Archive);

@@ -1,10 +1,10 @@
 import { StackNavigator, TabNavigator } from 'react-navigation';
-
 import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
 import Archive from './components/Archive';
 import Search from './components/Search';
 import Episode from './components/Episode'
+import AddNew from './components/AddNew'
 
 var mainFlow = TabNavigator(
 	{
@@ -71,6 +71,12 @@ export default StackNavigator(
 		},
 		Episode: {
 			screen: Episode,
+			navigationOptions: ({ navigation }) => ({
+				header: null
+			})
+		},
+		AddNew: {
+			screen: AddNew,
 			navigationOptions: ({ navigation }) => ({
 				header: null
 			})
