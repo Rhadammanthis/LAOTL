@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import {
     StyleSheet, Text, View,
-    TouchableOpacity,
     Image, TouchableNativeFeedback,
-    Linking, Animated, Easing, SectionList
+    SectionList, Animated, Platform
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -11,15 +10,16 @@ import Transparency from './common/Transparency'
 import Constants from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
-import { selectEpisode, toggleNavbarFade, clearNewContentValues } from '../actions'
+import { clearNewContentValues } from '../actions'
+
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 
 class Episode extends Component {
 
     state = {
-        animButtonPossition: new Animated.Value(0),
-        animComplete: false,
         scrollPoss: 0,
-        sectionsData: []
+        sectionsData: [],
+        scrollY: new Animated.Value(0)
     }
 
     sectionsData = []
@@ -49,9 +49,9 @@ class Episode extends Component {
                 <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
                 <Transparency size={35} />
                 <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <Text style={[styles.title, { opacity: (1 - this.props.fade) }]}>
+                    <Animated.Text style={[styles.title, {  }]}>
                         {this.props.selectedEpisode.title}
-                    </Text>
+                    </Animated.Text>
                     <View style={{ flex: 2, flexDirection: 'row' }}>
                         <Image style={styles.icon} source={require('../images/clock.png')} />
                         <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
@@ -76,43 +76,6 @@ class Episode extends Component {
                 {section.key.toUpperCase()}
             </Text>
         )
-    }
-
-    onListScroll = (event) => {
-
-        this.props.toggleNavbarFade(event.nativeEvent.contentOffset.y)
-
-        var currentOffset = event.nativeEvent.contentOffset.y;
-        var direction = currentOffset > this.offset ? 'down' : 'up';
-
-        if (direction === "up" && this.state.animComplete === true) {
-
-            this.setState({ animComplete: false })
-
-            Animated.timing(this.state.animButtonPossition, {
-                toValue: 0,
-                duration: 700,
-                easing: Easing.inOut(Easing.exp),
-            }).start(onComplete = () => {
-                console.log('Anim complete')
-            })
-        }
-
-        if (direction === "down" && (currentOffset - this.state.scrollPoss) > 60 && this.state.animComplete === false) {
-
-            this.setState({ animComplete: true })
-
-            Animated.timing(this.state.animButtonPossition, {
-                toValue: 1,
-                duration: 700,
-                easing: Easing.inOut(Easing.exp),
-            }).start(onComplete = () => {
-                console.log('Anim complete')
-            })
-        }
-
-        this.offset = currentOffset;
-
     }
 
     selectItemRenderer = (item, section) => {
@@ -142,21 +105,36 @@ class Episode extends Component {
 
     render() {
 
+        const animFade =  Animated.event(
+            [{
+                nativeEvent: { contentOffset: { y: this.state.scrollY } }
+            }],
+            {
+                useNativeDriver: true
+            }
+        )
+
+        var headerFade = this.state.scrollY.interpolate({
+            inputRange: [175, 254, 255],
+            outputRange: [0, 0.9, 1],
+            extrapolate: 'clamp'
+        });
+
         return (
             <View style={{ flex: 1 }}>
-                <SectionList
-                    onScroll={this.onListScroll}
+                <AnimatedSectionList
+                    onScroll={animFade}
                     style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
-                    ListHeaderComponent={this.renderListHeader}
+                    ListHeaderComponent={this.renderListHeader(headerFade)}
                     renderSectionHeader={({ section }) => this.renderSectionHeader(section)}
                     keyExtractor={(item) => item.title}
                     sections={this.sectionsData}>
-                </SectionList>
-                <View style={[styles.navBar, { opacity: this.props.fade, }]}>
-                    <Text style={styles.navBarTitle} numberOfLines={1}>
+                </AnimatedSectionList>
+                <Animated.View style={[styles.navBar, { opacity: headerFade }]}>
+                    <Animated.Text style={[styles.navBarTitle, { opacity: headerFade }]} numberOfLines={1}>
                         {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
-                    </Text>
-                </View>
+                    </Animated.Text>
+                </Animated.View>
                 <TouchableNativeFeedback style={styles.backButton}
                     onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
@@ -272,4 +250,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps, { toggleNavbarFade, clearNewContentValues })(Episode)
+export default connect(mapStateToProps, { clearNewContentValues })(Episode)
