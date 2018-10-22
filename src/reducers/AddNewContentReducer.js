@@ -5,13 +5,13 @@ import {
     CLEAR_NEW_CONTENT_VALUES,
     CHANGE_RESPONSE_COLOR
 } from '../actions/types';
-import {COLOR} from "../components/common/Constants"
+import {COLORS} from "../components/common/Constants"
 
 const INITIAL_STATE = {
-    searchText: "",
+    searchText: "https://www.google.com",
     searchResult: {content: null},
     contentAddedResponse: null,
-    responseColor: COLOR.BRIGHT_ORANGE
+    responseColor: COLORS.BRIGHT_ORANGE
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -23,7 +23,7 @@ export default (state = INITIAL_STATE, action) => {
             return { ...state, searchResult: { content: action.payload, res_code: Math.random() } }
         case NEW_CONETNT_ADDED:
             return { ...state, contentAddedResponse: action.payload, 
-                responseColor: action.payload.status === 200 ? COLOR.GREEN : COLOR.RED }
+                responseColor: action.payload.status === 200 ? COLORS.GREEN : COLORS.RED }
         case CLEAR_NEW_CONTENT_VALUES:
             return { ...INITIAL_STATE }
         case CHANGE_RESPONSE_COLOR:

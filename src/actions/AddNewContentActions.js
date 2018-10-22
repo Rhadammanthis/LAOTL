@@ -5,6 +5,7 @@ import {
     CLEAR_NEW_CONTENT_VALUES,
     CHANGE_RESPONSE_COLOR
 } from './types'
+import { CONTENT_TYPE } from '../components/common/Constants'
 import axios from 'axios'
 
 // export const selectEpisode = (episode, navigate) => {
@@ -16,8 +17,8 @@ import axios from 'axios'
 //     };
 // };
 
-export const clearNewContentValues = () =>{
-    return{
+export const clearNewContentValues = () => {
+    return {
         type: CLEAR_NEW_CONTENT_VALUES
     }
 }
@@ -41,7 +42,7 @@ export const addNewContent = (type, content, episodeId, show_notes) => {
                 console.log(response);
                 dispatch({ type: NEW_CONETNT_ADDED, payload: response });
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error.response);
                 dispatch({ type: NEW_CONETNT_ADDED, payload: error });
             });
@@ -59,7 +60,7 @@ export const searchTextChanged = (text) => {
 
 export const searchContent = (type, query) => {
     switch (type) {
-        case "movie":
+        case CONTENT_TYPE.MOVIE:
 
             if (query.includes('www.themoviedb.org')) {
                 var splitStart = query.indexOf('movie', 23)
@@ -77,6 +78,19 @@ export const searchContent = (type, query) => {
                     dispatch({ type: NEW_CONTENT_DATA, payload: res });
                 });
             }
+        case CONTENT_TYPE.ARTICLE:
+
+            return (dispatch) => {
+                axios.get(query)
+                    .then((response) => {
+                        console.log(response);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: response });
+                    })
+                    .catch((error) => {
+                        console.log(error.response);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: error });
+                    });
+            }
 
 
 
@@ -84,7 +98,7 @@ export const searchContent = (type, query) => {
 }
 
 export const changeResponseColor = (color) => {
-    return{
+    return {
         type: CHANGE_RESPONSE_COLOR,
         payload: color
     }

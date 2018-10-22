@@ -7,7 +7,7 @@ import {
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
-import Constants from './common/Constants'
+import {COLORS, CONTENT_TYPE} from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
 import { clearNewContentValues } from '../actions'
@@ -52,9 +52,9 @@ class Episode extends Component {
                     <Animated.Text style={[styles.title, {  }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
-                    <View style={{ flex: 2, flexDirection: 'row' }}>
+                    <View style={{ flex: 3, flexDirection: 'row', justifyContent: 'flex-end' }}>
                         <Image style={styles.icon} source={require('../images/clock.png')} />
-                        <Text style={{ color: Constants.COLOR.MUTE_ORANGE, marginHorizontal: 10 }}>
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
                             {this.props.selectedEpisode.duration}
                         </Text>
                     </View>
@@ -62,7 +62,7 @@ class Episode extends Component {
                 <Text style={styles.description}>
                     {this.props.selectedEpisode.description}
                 </Text>
-                <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
                 <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
                     Show Notes
                     </Text>
@@ -72,7 +72,7 @@ class Episode extends Component {
 
     renderSectionHeader = (section) => {
         return (
-            <Text style={{ color: Constants.COLOR.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
+            <Text style={{ color: COLORS.MUTE_ORANGE, fontSize: 14, marginHorizontal: 10 }}>
                 {section.key.toUpperCase()}
             </Text>
         )
@@ -124,7 +124,7 @@ class Episode extends Component {
             <View style={{ flex: 1 }}>
                 <AnimatedSectionList
                     onScroll={animFade}
-                    style={{ backgroundColor: Constants.COLOR.BACKGROUND }}
+                    style={{ backgroundColor: COLORS.BACKGROUND }}
                     ListHeaderComponent={this.renderListHeader(headerFade)}
                     renderSectionHeader={({ section }) => this.renderSectionHeader(section)}
                     keyExtractor={(item) => item.title}
@@ -140,19 +140,19 @@ class Episode extends Component {
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
                 <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent("video") }} textStyle={{ color: "white", fontSize: 15 }}
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.MOVIE) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-play" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent("movie") }} textStyle={{ color: "white", fontSize: 15 }}
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent(CONTENT_TYPE.MOVIE) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-film" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent("book") }} textStyle={{ color: "white", fontSize: 15 }}
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent(CONTENT_TYPE.BOOK) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-book" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent("article") }} textStyle={{ color: "white", fontSize: 15 }}
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent(CONTENT_TYPE.ARTICLE) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-document" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: Constants.COLOR.TOOLBAR,
+        backgroundColor: COLORS.TOOLBAR,
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     navBarTitle: {
         flex: 1,
         fontSize: 18,
-        color: Constants.COLOR.MUTE_ORANGE,
+        color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
         marginLeft: 35
     },
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         height: 60,
         width: 60,
-        backgroundColor: Constants.COLOR.BRIGHT_ORANGE
+        backgroundColor: COLORS.BRIGHT_ORANGE
     },
     addContentImage: {
         height: 40,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     backButtonImage: {
         height: 25,
         width: 25,
-        tintColor: Constants.COLOR.BRIGHT_ORANGE,
+        tintColor: COLORS.BRIGHT_ORANGE,
         marginLeft: 5,
         position: 'absolute',
         top: 13,
@@ -224,11 +224,11 @@ const styles = StyleSheet.create({
         marginTop: -5,
         height: 25,
         width: 25,
-        tintColor: Constants.COLOR.BRIGHT_ORANGE,
+        tintColor: COLORS.BRIGHT_ORANGE,
     },
     title: {
         flex: 8,
-        color: Constants.COLOR.MUTE_ORANGE,
+        color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
         fontSize: 35,
         marginTop: -25,

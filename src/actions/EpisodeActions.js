@@ -11,23 +11,3 @@ export const selectEpisode = (episode, firebaseId, navigate) => {
         payload: episode
     };
 };
-
-export const toggleNavbarFade = (scroll) => {
-
-    var newOpacity;
-    
-    if(scroll > 175 && scroll < 225){
-        newOpacity = (scroll - 175) * 0.02
-    }
-    else
-        if(scroll <= 175)
-            newOpacity = 0;
-        else
-            newOpacity = 1;
-
-    return {
-        type: FADE_NAVBAR,
-        payload: newOpacity
-    }
-
-}

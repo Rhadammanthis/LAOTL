@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
-import Constants from '../common/Constants'
+import {COLORS} from '../common/Constants'
 
 export class ArticleListItem extends React.PureComponent {
 
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         marginTop: -5,
         height: 25,
         width: 25,
-        tintColor: Constants.COLOR.BRIGHT_ORANGE,
+        tintColor: COLORS.BRIGHT_ORANGE,
     }
 })
 

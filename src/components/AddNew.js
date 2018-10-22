@@ -5,7 +5,7 @@ import {
     Image, Button, ActivityIndicator,
     ScrollView, Keyboard, Animated, Easing
 } from 'react-native';
-import Constants from './common/Constants'
+import { COLORS, CONTENT_TYPE } from './common/Constants'
 import Fade from './common/Fade'
 import { connect } from 'react-redux'
 import { searchTextChanged, searchContent, addNewContent } from '../actions'
@@ -22,7 +22,7 @@ class AddNew extends Component {
         showText: false,
         intervalId: null,
         colorAnimation: new Animated.Value(0),
-        progressColor: Constants.COLOR.BRIGHT_ORANGE,
+        progressColor: COLORS.BRIGHT_ORANGE,
         progressMessage: "Working on that...",
         show: false
     }
@@ -97,7 +97,7 @@ class AddNew extends Component {
             this.setState({
                 progress: 0.01,
                 showText: false,
-                progressColor: Constants.COLOR.BRIGHT_ORANGE,
+                progressColor: COLORS.BRIGHT_ORANGE,
                 progressMessage: "Working on that...",
             })
 
@@ -138,8 +138,11 @@ class AddNew extends Component {
 
     buildNewContentQuery() {
         switch (this.contentType) {
-            case "movie":
+            case CONTENT_TYPE.MOVIE:
                 var content = { movie_id: this.props.searchResult.content.id };
+                break;
+            case CONTENT_TYPE.ARTICLE:
+                var content = { url: this.props.searchResult.content.id };
                 break;
         }
         this.props.addNewContent(this.contentType, content, this.firebaseId, this.props.selectedEpisode.show_notes);
@@ -147,9 +150,9 @@ class AddNew extends Component {
 
     progressMessage = () => {
         switch (this.props.responseColor) {
-            case Constants.COLOR.GREEN:
+            case COLORS.GREEN:
                 return "Success!"
-            case Constants.COLOR.RED:
+            case COLORS.RED:
                 return "Something went wrong"
             default:
                 return "Working on that"
@@ -159,16 +162,25 @@ class AddNew extends Component {
     renderContentFlipCard() {
 
         switch (this.contentType) {
-            case "movie":
+            case CONTENT_TYPE.MOVIE:
                 var content = (
                     <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10 }}>
                         <Image style={{ flex: 1, width: 200 }} source={{ uri: "https://image.tmdb.org/t/p/original" + this.props.searchResult.content.poster_path }} />
-                        <View style={{ height: StyleSheet.hairlineWidth, width: 270, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10, marginHorizontal: 15 }} />
+                        <View style={{ height: StyleSheet.hairlineWidth, width: 270, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10, marginHorizontal: 15 }} />
                         <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 20, marginHorizontal: 25 }}>
                             {this.props.searchResult.content.title}
                         </Text>
                         <Text style={{ color: 'white', fontSize: 15, marginHorizontal: 50 }}>
                             ({this.props.searchResult.content.release_date.slice(0, 4)})
+                        </Text>
+                    </View>)
+                break
+            case CONTENT_TYPE.ARTICLE:
+                var content = (
+                    <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10, width: 270 }}>
+                        <Icon name="md-checkmark-circle" style={{ fontSize: 100, height: 102, color: COLORS.GREEN}} />
+                        <Text style={{ color: 'white', fontSize: 20, marginHorizontal: 25, marginTop: 10 }}>
+                            All READY
                         </Text>
                     </View>)
                 break
@@ -205,7 +217,7 @@ class AddNew extends Component {
                 return (
                     <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
                         <Icon name="md-eye" style={styles.contentIcon} />
-                        <Text style={{ marginHorizontal: 20, color: Constants.COLOR.TOOLBAR, textAlign: 'justify' }}>
+                        <Text style={{ marginHorizontal: 20, color: COLORS.TOOLBAR, textAlign: 'justify' }}>
                             No new content... yet.
                         </Text>
                     </View>
@@ -215,7 +227,7 @@ class AddNew extends Component {
                 return (<ActivityIndicator
                     style={styles.centering}
                     size="large"
-                    color={Constants.COLOR.BRIGHT_ORANGE}
+                    color={COLORS.BRIGHT_ORANGE}
                 />)
             //Search results
             case 2:
@@ -227,11 +239,11 @@ class AddNew extends Component {
                 else {
                     return (
                         <View style={{ justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
-                            <View style={{ height: 1, width: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                            <View style={{ height: 1, width: 150, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
                             <Text style={{ color: 'white', fontSize: 20 }}>
                                 {this.getNoContentMessage()}
                             </Text>
-                            <View style={{ height: 1, width: 150, backgroundColor: Constants.COLOR.BRIGHT_ORANGE, marginVertical: 10 }} />
+                            <View style={{ height: 1, width: 150, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
                         </View>
                     )
                 }
@@ -241,8 +253,10 @@ class AddNew extends Component {
 
     getNoContentMessage() {
         switch (this.contentType) {
-            case "movie":
+            case CONTENT_TYPE.MOVIE:
                 return "Movie id not found 😞"
+            case CONTENT_TYPE.ARTICLE:
+                return "URL not found 😞"
             default:
                 return "Something went wrong 😞"
         }
@@ -250,10 +264,34 @@ class AddNew extends Component {
 
     getAlertMessage() {
         switch (this.contentType) {
-            case "movie":
+            case CONTENT_TYPE.MOVIE:
                 return "To add a new movie you'll have to get it's id from The Movie Database (themoviedb.org). Type it into the box or copy the entire movie's profile url and load it, then simply press the button down below"
+            case CONTENT_TYPE.ARTICLE:
+                return "To add a new article just paste the corresponding url in the box to load it, then just simply press the button down below"
             default:
                 return "Something went wrong 😞"
+        }
+    }
+
+    getHint() {
+        switch (this.contentType) {
+            case CONTENT_TYPE.MOVIE:
+                return "TMDB id or url"
+            case CONTENT_TYPE.ARTICLE:
+                return "URL"
+            default:
+                return "Content"
+        }
+    }
+
+    getContentTypeLabel() {
+        switch (this.contentType) {
+            case CONTENT_TYPE.MOVIE:
+                return "movie"
+            case CONTENT_TYPE.ARTICLE:
+                return "article"
+            default:
+                return "Content"
         }
     }
 
@@ -261,26 +299,28 @@ class AddNew extends Component {
         if (this.state.show === false)
             return null
 
-        return (<Button
-            title="Add content"
-            onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
-            style={{ marginVertical: 10, height: 100 }}
-            color={Constants.COLOR.BRIGHT_ORANGE}
-            accessibilityLabel="Learn more about this purple button"
-        />)
+        return (
+            <Button
+                title="Add content"
+                onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
+                style={{ marginVertical: 10, height: 100 }}
+                color={COLORS.BRIGHT_ORANGE}
+                accessibilityLabel="Learn more about this purple button"
+            />
+        )
     }
 
     render() {
 
         return (
-            <View style={{ backgroundColor: Constants.COLOR.BACKGROUND, flex: 1 }}>
+            <View style={{ backgroundColor: COLORS.BACKGROUND, flex: 1 }}>
                 <View style={styles.navBar}>
                     <TouchableNativeFeedback
                         onPress={() => { if (this.preventInteraction()) return; this.props.navigation.goBack() }}>
                         <Icon name="md-close" style={styles.actionButtonIcon} />
                     </TouchableNativeFeedback>
                     <Text style={styles.navBarTitle} numberOfLines={1}>
-                        Add new {this.contentType}
+                        Add new {this.getContentTypeLabel()}
                     </Text>
                     <TouchableNativeFeedback
                         style={{ marginRight: 10 }}
@@ -291,7 +331,7 @@ class AddNew extends Component {
                 <View style={{ flex: 1, marginTop: 10 }}>
                     <View style={{ flexDirection: 'row', paddingRight: 10, justifyContent: 'space-around', alignItems: 'center' }}>
                         <TextInput underlineColorAndroid='rgba(0,0,0,0)' value={this.props.searchText} onChangeText={this.onTextChanged.bind(this)}
-                            placeholder="TMDB id or url" onSubmitEditing={this.searchForNewContent.bind(this)} style={styles.textInput} />
+                            placeholder={this.getHint()} onSubmitEditing={this.searchForNewContent.bind(this)} style={styles.textInput} />
                         <TouchableNativeFeedback
                             onPress={() => { if (this.preventInteraction()) return; this.searchForNewContent() }}>
                             <Icon name="md-search" style={styles.actionButtonIcon} />
@@ -313,7 +353,7 @@ const styles = StyleSheet.create({
     navBar: {
         paddingHorizontal: 10,
         height: 50,
-        backgroundColor: Constants.COLOR.TOOLBAR,
+        backgroundColor: COLORS.TOOLBAR,
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -321,7 +361,7 @@ const styles = StyleSheet.create({
     navBarTitle: {
         flex: 1,
         fontSize: 18,
-        color: Constants.COLOR.MUTE_ORANGE,
+        color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
         marginLeft: 20
     },
@@ -349,7 +389,7 @@ const styles = StyleSheet.create({
     backButtonImage: {
         height: 25,
         width: 25,
-        tintColor: Constants.COLOR.BRIGHT_ORANGE,
+        tintColor: COLORS.BRIGHT_ORANGE,
         marginLeft: 5,
     },
     description: {
@@ -362,11 +402,11 @@ const styles = StyleSheet.create({
         marginTop: -5,
         height: 25,
         width: 25,
-        tintColor: Constants.COLOR.BRIGHT_ORANGE,
+        tintColor: COLORS.BRIGHT_ORANGE,
     },
     title: {
         flex: 8,
-        color: Constants.COLOR.MUTE_ORANGE,
+        color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
         fontSize: 35,
         marginTop: -25,
@@ -375,12 +415,12 @@ const styles = StyleSheet.create({
     actionButtonIcon: {
         fontSize: 30,
         height: 32,
-        color: Constants.COLOR.BRIGHT_ORANGE,
+        color: COLORS.BRIGHT_ORANGE,
     },
     contentIcon: {
         fontSize: 120,
         height: 122,
-        color: Constants.COLOR.TOOLBAR,
+        color: COLORS.TOOLBAR,
     }
 });
 
