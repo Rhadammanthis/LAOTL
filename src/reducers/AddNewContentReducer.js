@@ -8,7 +8,7 @@ import {
 import {COLORS} from "../components/common/Constants"
 
 const INITIAL_STATE = {
-    searchText: "https://books.google.is/books?id=dRE-AAAAQBAJ&printsec=frontcover&dq=devils+knot&hl=en&sa=X&ved=0ahUKEwig2e_7npreAhVNaFAKHYatBY4Q6AEIKDAA#v=onepage&q=devils%20knot&f=false",
+    searchText: "https://www.youtube.com/watch?v=3cX7wisSiWI",
     searchResult: {content: null},
     contentAddedResponse: null,
     responseColor: COLORS.BRIGHT_ORANGE

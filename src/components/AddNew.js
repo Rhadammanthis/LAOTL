@@ -194,6 +194,19 @@ class AddNew extends Component {
                         </Text>
                     </View>)
                 break
+            case CONTENT_TYPE.VIDEO:
+                var content = (
+                    <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10 }}>
+                        <Image style={{ height: 180, width: 240 }} source={{ uri: this.props.searchResult.content.data.thumbnail_url }} />
+                        <View style={{ height: StyleSheet.hairlineWidth, width: 270, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10, marginHorizontal: 15 }} />
+                        <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 20, marginHorizontal: 25 }}>
+                            {this.props.searchResult.content.data.title}
+                        </Text>
+                        <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 12, marginHorizontal: 10 }}>
+                            by {this.props.searchResult.content.data.author_name}
+                        </Text>
+                    </View>)
+                break
             case CONTENT_TYPE.ARTICLE:
                 var content = (
                     <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10, width: 270 }}>
@@ -276,6 +289,8 @@ class AddNew extends Component {
                 return "Movie id not found 😞"
             case CONTENT_TYPE.BOOK:
                 return "Book not found 😞"
+            case CONTENT_TYPE.VIDEO:
+                return "Video not found 😞"
             case CONTENT_TYPE.ARTICLE:
                 return "URL not found 😞"
             default:
@@ -289,6 +304,8 @@ class AddNew extends Component {
                 return "To add a new movie you'll have to get it's id from The Movie Database (themoviedb.org). Type it into the box or copy the movie's profile url to load it, then simply press the button down below"
             case CONTENT_TYPE.BOOK:
                 return "To add a new book you'll have to get it's id from Google Books (books.google.com). Copy the book's profile url to load it, then simply press the button down below"
+            case CONTENT_TYPE.VIDEO:
+                return "To add a new video you'll have to get it's id from YouTube (youtube.com). Copy the video's url to load it, then simply press the button down below"
             case CONTENT_TYPE.ARTICLE:
                 return "To add a new article just paste the corresponding url in the box to load it, then just simply press the button down below"
             default:
@@ -302,6 +319,8 @@ class AddNew extends Component {
                 return "TMDB id or URL"
             case CONTENT_TYPE.BOOK:
                 return "Book id or URL"
+            case CONTENT_TYPE.VIDEO:
+                return "Video id or URL"
             case CONTENT_TYPE.ARTICLE:
                 return "Artcle's URL"
             default:
@@ -315,6 +334,8 @@ class AddNew extends Component {
                 return "movie"
             case CONTENT_TYPE.ARTICLE:
                 return "article"
+            case CONTENT_TYPE.VIDEO:
+                return "video"
             case CONTENT_TYPE.BOOK:
                 return "book"
             default:

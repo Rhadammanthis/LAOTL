@@ -101,6 +101,22 @@ export const searchContent = (type, query) => {
                     });
             }
 
+        case CONTENT_TYPE.VIDEO:
+
+            console.log("Book id:" + "https://noembed.com/embed?url=" + query)
+
+            return (dispatch) => {
+                axios.get("https://noembed.com/embed?url=" + query)
+                    .then((response) => {
+                        console.log(response);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: response });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: error });
+                    });
+            }
+
         case CONTENT_TYPE.ARTICLE:
 
             return (dispatch) => {

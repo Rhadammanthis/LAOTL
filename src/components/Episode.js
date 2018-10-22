@@ -140,7 +140,7 @@ class Episode extends Component {
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
                 <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.MOVIE) }} textStyle={{ color: "white", fontSize: 15 }}
+                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.VIDEO) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-play" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
