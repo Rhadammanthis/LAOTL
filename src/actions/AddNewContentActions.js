@@ -78,6 +78,29 @@ export const searchContent = (type, query) => {
                     dispatch({ type: NEW_CONTENT_DATA, payload: res });
                 });
             }
+
+        case CONTENT_TYPE.BOOK:
+
+            if (query.includes('https://books.google')) {
+                var splitStart = query.indexOf('id=')
+                var splitEnd = query.indexOf('&', splitStart)
+                query = query.slice(splitStart, splitEnd)
+            }
+
+            console.log("Book id:" + query)
+
+            return (dispatch) => {
+                axios.get("https://www.googleapis.com/books/v1/volumes?q=id:" + query)
+                    .then((response) => {
+                        console.log(response);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: response });
+                    })
+                    .catch((error) => {
+                        console.log(error.response);
+                        dispatch({ type: NEW_CONTENT_DATA, payload: error });
+                    });
+            }
+
         case CONTENT_TYPE.ARTICLE:
 
             return (dispatch) => {

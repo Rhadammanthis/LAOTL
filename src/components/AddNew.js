@@ -141,6 +141,9 @@ class AddNew extends Component {
             case CONTENT_TYPE.MOVIE:
                 var content = { movie_id: this.props.searchResult.content.id };
                 break;
+            case CONTENT_TYPE.BOOK:
+                var content = { book_id: this.props.searchResult.content.data.items[0].id };
+                break;
             case CONTENT_TYPE.ARTICLE:
                 var content = { url: this.props.searchResult.content.id };
                 break;
@@ -175,10 +178,26 @@ class AddNew extends Component {
                         </Text>
                     </View>)
                 break
+            case CONTENT_TYPE.BOOK:
+                var content = (
+                    <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10 }}>
+                        <Image style={{ flex: 1, width: 200 }} source={{ uri: this.props.searchResult.content.data.items[0].volumeInfo.imageLinks.thumbnail }} />
+                        <View style={{ height: StyleSheet.hairlineWidth, width: 270, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10, marginHorizontal: 15 }} />
+                        <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 20, marginHorizontal: 25 }}>
+                            {this.props.searchResult.content.data.items[0].volumeInfo.title}
+                        </Text>
+                        <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 12, marginHorizontal: 10 }}>
+                            by {this.props.searchResult.content.data.items[0].volumeInfo.authors[0]}
+                        </Text>
+                        <Text style={{ color: 'white', fontSize: 15, marginHorizontal: 50 }}>
+                            ({this.props.searchResult.content.data.items[0].volumeInfo.publishedDate})
+                        </Text>
+                    </View>)
+                break
             case CONTENT_TYPE.ARTICLE:
                 var content = (
                     <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10, width: 270 }}>
-                        <Icon name="md-checkmark-circle" style={{ fontSize: 100, height: 102, color: COLORS.GREEN}} />
+                        <Icon name="md-checkmark-circle" style={{ fontSize: 100, height: 102, color: COLORS.GREEN }} />
                         <Text style={{ color: 'white', fontSize: 20, marginHorizontal: 25, marginTop: 10 }}>
                             All READY
                         </Text>
@@ -255,6 +274,8 @@ class AddNew extends Component {
         switch (this.contentType) {
             case CONTENT_TYPE.MOVIE:
                 return "Movie id not found 😞"
+            case CONTENT_TYPE.BOOK:
+                return "Book not found 😞"
             case CONTENT_TYPE.ARTICLE:
                 return "URL not found 😞"
             default:
@@ -265,7 +286,9 @@ class AddNew extends Component {
     getAlertMessage() {
         switch (this.contentType) {
             case CONTENT_TYPE.MOVIE:
-                return "To add a new movie you'll have to get it's id from The Movie Database (themoviedb.org). Type it into the box or copy the entire movie's profile url and load it, then simply press the button down below"
+                return "To add a new movie you'll have to get it's id from The Movie Database (themoviedb.org). Type it into the box or copy the movie's profile url to load it, then simply press the button down below"
+            case CONTENT_TYPE.BOOK:
+                return "To add a new book you'll have to get it's id from Google Books (books.google.com). Copy the book's profile url to load it, then simply press the button down below"
             case CONTENT_TYPE.ARTICLE:
                 return "To add a new article just paste the corresponding url in the box to load it, then just simply press the button down below"
             default:
@@ -276,9 +299,11 @@ class AddNew extends Component {
     getHint() {
         switch (this.contentType) {
             case CONTENT_TYPE.MOVIE:
-                return "TMDB id or url"
+                return "TMDB id or URL"
+            case CONTENT_TYPE.BOOK:
+                return "Book id or URL"
             case CONTENT_TYPE.ARTICLE:
-                return "URL"
+                return "Artcle's URL"
             default:
                 return "Content"
         }
@@ -290,6 +315,8 @@ class AddNew extends Component {
                 return "movie"
             case CONTENT_TYPE.ARTICLE:
                 return "article"
+            case CONTENT_TYPE.BOOK:
+                return "book"
             default:
                 return "Content"
         }
@@ -305,7 +332,6 @@ class AddNew extends Component {
                 onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
                 style={{ marginVertical: 10, height: 100 }}
                 color={COLORS.BRIGHT_ORANGE}
-                accessibilityLabel="Learn more about this purple button"
             />
         )
     }
