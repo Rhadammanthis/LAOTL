@@ -8,7 +8,7 @@ import {
 import {COLORS} from "../components/common/Constants"
 
 const INITIAL_STATE = {
-    searchText: "https://www.youtube.com/watch?v=3cX7wisSiWI",
+    searchText: "666",
     searchResult: {content: null},
     contentAddedResponse: null,
     responseColor: COLORS.BRIGHT_ORANGE

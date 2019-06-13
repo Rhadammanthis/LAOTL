@@ -139,16 +139,16 @@ class AddNew extends Component {
     buildNewContentQuery() {
         switch (this.contentType) {
             case CONTENT_TYPE.MOVIE:
-                var content = { movie_id: this.props.searchResult.content.id };
+                var data = { movie_id: this.props.searchResult.content.id };
                 break;
             case CONTENT_TYPE.BOOK:
-                var content = { book_id: this.props.searchResult.content.data.items[0].id };
+                var data = { book_id: this.props.searchResult.content.data.items[0].id };
                 break;
             case CONTENT_TYPE.ARTICLE:
-                var content = { url: this.props.searchResult.content.id };
+                var data = { url: this.props.searchResult.content.id };
                 break;
         }
-        this.props.addNewContent(this.contentType, content, this.firebaseId, this.props.selectedEpisode.show_notes);
+        this.props.addNewContent("movies", data, this.firebaseId, this.props.selectedEpisode.part_of_series);
     }
 
     progressMessage = () => {
@@ -351,7 +351,7 @@ class AddNew extends Component {
             <Button
                 title="Add content"
                 onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
-                style={{ marginVertical: 10, height: 100 }}
+                style={{ marginVertical: 10, height: 120 }}
                 color={COLORS.BRIGHT_ORANGE}
             />
         )

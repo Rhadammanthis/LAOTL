@@ -23,27 +23,28 @@ export const clearNewContentValues = () => {
     }
 }
 
-export const addNewContent = (type, content, episodeId, show_notes) => {
+export const addNewContent = (type, data, episodeId, part_of_series) => {
 
     console.log("Adding content.....")
 
-    var data = {
-        episode_id: episodeId,
-        type: type,
-        show_notes: show_notes,
-        content: content
+    var body = {
+        data,
+        eid: part_of_series != null ? part_of_series : episodeId,
+        category: type,
+        uid: "-LgDElEfPYMILyZZkAb1",
+        part_of_series: part_of_series != null ? true : false
     }
 
-    console.log(data)
+    console.log("READY TO LAUNCH", body)
 
     return (dispatch) => {
-        axios.post('https://radiant-eyrie-44862.herokuapp.com/laotl/addContent', data)
+        axios.post('http://192.168.0.105:8080/laotl/notes', body)
             .then((response) => {
                 console.log(response);
                 dispatch({ type: NEW_CONETNT_ADDED, payload: response });
             })
             .catch((error) => {
-                console.log(error.response);
+                console.log("error", error);
                 dispatch({ type: NEW_CONETNT_ADDED, payload: error });
             });
     }

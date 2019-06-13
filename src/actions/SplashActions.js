@@ -10,7 +10,7 @@ export const dataFetch = () => {
     const { currentUser } = firebase.auth();
 
     return(dispatch) => {
-        firebase.database().ref(`/tracks`)
+        firebase.database().ref(`/episodes`)
             .once('value', snapshot => {
                 dispatch({ type: EPISODES_FETCHED, payload: snapshot.val() });
                 console.log('Called')

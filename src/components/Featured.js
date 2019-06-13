@@ -37,7 +37,7 @@ class Featured extends Component {
                 <TouchableOpacity key={i} style={ [styles.featureView] } onPress={() => { this.props.selectEpisode(mappedEpisodes[i], mappedEpisodes[i].firebaseId, this.props.navigation.navigate) }}>
                     <View style={{ flex: 1 }}>
                         <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
-                            source={{ uri: mappedEpisodes[i].image }}
+                            source={{ uri: mappedEpisodes[i].cover_image }}
                             blurRadius={1.2}>
                         </Image>
                         <View>

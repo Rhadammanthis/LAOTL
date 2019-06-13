@@ -44,10 +44,19 @@ class Episode extends Component {
 
     renderListHeader = () => {
 
+        millisToReadable = (millis) => {
+            sec = millis / 1000
+            hour = Math.floor(sec / 3600);
+            min = Math.floor(((sec - (hour * 3600)) / 60))
+            sec = sec - (hour * 3600) - (min * 60)
+
+            return hour + ":" + (min < 10 ? "0" + min : min) + ":"  + (sec < 10 ? "0" + sec : sec)
+        }
+
         return (
             <View>
-                <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.image }} />
-                <Transparency size={35} />
+                <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.cover_image }} />
+                <Transparency size={55} />
                 <View style={{ flex: 1, flexDirection: 'row' }}>
                     <Animated.Text style={[styles.title, {  }]}>
                         {this.props.selectedEpisode.title}
@@ -55,7 +64,7 @@ class Episode extends Component {
                     <View style={{ flex: 3, flexDirection: 'row', justifyContent: 'flex-end' }}>
                         <Image style={styles.icon} source={require('../images/clock.png')} />
                         <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
-                            {this.props.selectedEpisode.duration}
+                            {millisToReadable(this.props.selectedEpisode.duration)}
                         </Text>
                     </View>
                 </View>
