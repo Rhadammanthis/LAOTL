@@ -8,7 +8,7 @@ import {
 import {COLORS} from "../components/common/Constants"
 
 const INITIAL_STATE = {
-    searchText: "666",
+    searchText: "97686",
     searchResult: {content: null},
     contentAddedResponse: null,
     responseColor: COLORS.BRIGHT_ORANGE

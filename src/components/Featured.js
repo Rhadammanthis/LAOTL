@@ -58,30 +58,30 @@ class Featured extends Component {
         }
                 
 
-        var sortCategoryResource = (category) => {
-            switch (category) {
-                case 'Serial Killers':
-                    return "SK";
-                case 'Conspiracy':
-                    return "Con";
-                case 'Satanism and the Ocult':
-                    return "SatO"
-                case 'Cults, Spirituality and Psychics':
-                    return "CSP"
-                case 'Aliens':
-                    return "A"
-                case 'Miscellaneous':
-                    return "Misc"
-                case 'Horrors of Reality':
-                    return "HoR"
-                case 'Monsters and Cryptoids':
-                    return "MaC"
-                case 'Creepypasta':
-                    return "Cree"
-                case 'Ghosts and Hauntings':
-                    return "GaH"
-            }
-        }
+        // var sortCategoryResource = (category) => {
+        //     switch (category) {
+        //         case 'Serial Killers':
+        //             return "SK";
+        //         case 'Conspiracy':
+        //             return "Con";
+        //         case 'Satanism and the Ocult':
+        //             return "SatO"
+        //         case 'Cults, Spirituality and Psychics':
+        //             return "CSP"
+        //         case 'Aliens':
+        //             return "A"
+        //         case 'Miscellaneous':
+        //             return "Misc"
+        //         case 'Horrors of Reality':
+        //             return "HoR"
+        //         case 'Monsters and Cryptoids':
+        //             return "MaC"
+        //         case 'Creepypasta':
+        //             return "Cree"
+        //         case 'Ghosts and Hauntings':
+        //             return "GaH"
+        //     }
+        // }
 
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>

@@ -28,18 +28,40 @@ class Episode extends Component {
 
         episode = this.props.selectedEpisode;
 
-        console.log('Firebase Id', this.props.navigation.state.params.firebaseId)
+        console.log('Episode Data', episode)
 
-        for (var key in episode.show_notes) {
-            if (episode.show_notes.hasOwnProperty(key)) {
-                console.log("KEYS", key)
-                this.sectionsData.push({
-                    key: key,
-                    data: episode.show_notes[key],
-                    renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
-                })
+        var episodeNotes;
+        for(var i =0 ; i < episode.notes.length; i++)
+            episodeNotes += episode.notes[i].length
+
+        for (var category in episode.notes){
+            console.log("Category", category)
+            var sectionContent = []
+            for(var item in episode.notes[category]){
+                console.log("Item", item);
+                var mappedItem = episode.notes[category][item]
+                mappedItem.nid = item
+                sectionContent.push(mappedItem)
             }
+            this.sectionsData.push({
+                key: category,
+                data: sectionContent,
+                renderItem: ({item, section}) => this.selectItemRenderer(item, section)
+            })
         }
+
+        console.log("Sections list", this.sectionsData[0])
+
+        // for (var key in episode.notes) {
+        //     if (episode.notes.hasOwnProperty(key)) {
+        //         console.log("KEYS", key)
+        //         this.sectionsData.push({
+        //             key: key,
+        //             data: episode.notes[key],
+        //             renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
+        //         })
+        //     }
+        // }
     }
 
     renderListHeader = () => {

@@ -5,6 +5,8 @@ export class MovieListItem extends React.PureComponent {
 
     render() {
 
+        console.log("Movie", this.props.item)
+
         return (
             <View style={{ flexDirection: 'row', flex: 1, marginHorizontal: 10, marginVertical: 5 }}
                 onPress={() => { Linking.openURL(`https://www.themoviedb.org/movie/${this.props.item.id}`) }}>
