@@ -1,6 +1,6 @@
 # LAOTL
-A crowd-sourced data base for all things Last Podcast On the Left.
+A crowd-sourced platform for all things Last Podcast On the Left.
 
-There's no place to scape to, thi is the Last App On the Left.
+There's no place to scape to, this is the Last App On the Left.
 
 Hail yourselves!
