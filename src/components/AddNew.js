@@ -3,7 +3,7 @@ import {
     StyleSheet, Text, TextInput, View,
     Alert, TouchableNativeFeedback,
     Image, Button, ActivityIndicator,
-    ScrollView, Keyboard, Animated, Easing
+    ScrollView, Keyboard, Animated, TouchableOpacity
 } from 'react-native';
 import { COLORS, CONTENT_TYPE } from './common/Constants'
 import Fade from './common/Fade'
@@ -168,7 +168,7 @@ class AddNew extends Component {
             case CONTENT_TYPE.MOVIE:
                 var content = (
                     <View style={{ flex: 1, justifyContent: 'center', flexDirection: 'column', alignItems: 'center', paddingVertical: 10 }}>
-                        <Image style={{ flex: 1, width: 200 }} source={{ uri: "https://image.tmdb.org/t/p/original" + this.props.searchResult.content.poster_path }} />
+                        <Image style={{ flex: 1, width: 222 }} source={{ uri: "https://image.tmdb.org/t/p/original" + this.props.searchResult.content.poster_path }} />
                         <View style={{ height: StyleSheet.hairlineWidth, width: 270, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10, marginHorizontal: 15 }} />
                         <Text ellipsizeMode={'tail'} numberOfLines={1} style={{ color: 'white', fontSize: 20, marginHorizontal: 25 }}>
                             {this.props.searchResult.content.title}
@@ -348,12 +348,17 @@ class AddNew extends Component {
             return null
 
         return (
-            <Button
-                title="Add content"
-                onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
-                style={{ marginVertical: 10, height: 120 }}
-                color={COLORS.BRIGHT_ORANGE}
-            />
+            <View style={{ flexDirection: 'row'}}>
+                <View style={{flex: 1}}></View>
+                <TouchableOpacity
+                    onPress={() => { if (this.preventInteraction()) return; this.flipCard() }}
+                    style={{ flex: 4, height: 40, marginVertical: 10, backgroundColor: COLORS.BRIGHT_ORANGE, justifyContent: 'center',
+                    alignItems: 'center', borderRadius: 50 }}
+                >
+                    <Text style={{ color: 'white', fontSize: 15 }}>Add Content</Text>
+                </TouchableOpacity >
+                <View style={{flex: 1}}></View>
+            </View>
         )
     }
 
@@ -387,7 +392,7 @@ class AddNew extends Component {
                     <ScrollView contentContainerStyle={{ flex: 1, justifyContent: 'space-around', alignItems: 'center', paddingVertical: 20, paddingHorizontal: 30 }}>
                         {this.renderContentState()}
                     </ScrollView>
-                    {this.renderAddNewConentButton()}
+                {this.renderAddNewConentButton()}
                 </View>
             </View>
 
