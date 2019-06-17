@@ -1,7 +1,7 @@
 import { SEARCH_CHANGED, SEARCH_RESULTS } from '../actions/types';
 
 const INITIAL_STATE = { 
-    searchText: '',
+    searchText: 'serial killers',
     searchResults: null
  };
 

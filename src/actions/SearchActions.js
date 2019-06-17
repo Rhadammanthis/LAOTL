@@ -16,35 +16,44 @@ export const doSerach = (episodes, textToSearch) => {
 
         var matches = [];
         const normalizedTextToSearch = textToSearch.toLowerCase()
-        
+
+        console.log("Episodes", Object.keys(episodes).slice(0, 10))
+
         Object.keys(episodes).slice(0, 10).map((x) => {
 
-            episodes[x].labels.forEach((label) => {
-                
-                if(levenshtein(label, normalizedTextToSearch) <= 1)
-                    matches.push(episodes[x])
-                else{
-                    const labelItems = label.split(" ");
-                    const textItems = normalizedTextToSearch.split(" ")
+            console.log("Episode", episodes[x])
+            console.log("Labels", episodes[x].labels)
 
-                    console.log("Label items", labelItems)
-                    console.log("Text items", textItems)
+            if (episodes[x].labels !== undefined) {
+                Object.keys(episodes[x].labels).map((key) => {
 
-                    for(var i = 0; i < textItems.length; i++){
-                        for(var j = 0; j < labelItems.length; j++){
-                            if(levenshtein(labelItems[j], textItems[i]) <= 1){
-                                if(!matches.includes(episodes[x]))
-                                    matches.push(episodes[x])
-                                break;
+                    var labelTitle = episodes[x].labels[key].name
+
+                    if (levenshtein(labelTitle, normalizedTextToSearch) <= 1)
+                        matches.push(episodes[x])
+                    else {
+                        const labelItems = labelTitle.split(" ");
+                        const textItems = normalizedTextToSearch.split(" ")
+
+                        console.log("Label items", labelItems)
+                        console.log("Text items", textItems)
+
+                        for (var i = 0; i < textItems.length; i++) {
+                            for (var j = 0; j < labelItems.length; j++) {
+                                if (levenshtein(labelItems[j], textItems[i]) <= 1) {
+                                    if (!matches.includes(episodes[x]))
+                                        matches.push(episodes[x])
+                                    break;
+                                }
                             }
+                            if (j != labelItems.length - 1)
+                                break;
                         }
-                        if(j != labelItems.length - 1)
-                            break;
                     }
-                }
-            });
-            // console.log('Actions...', Object.keys(episodes).slice(0, 10))
-            // console.log(`Search: ${textToSearch.toLowerCase()}, Label: ${episodes[x].labels}, Levebshtein: ${levenshtein(episodes[x].labels, textToSearch.toLowerCase())}`)
+                });
+                // console.log('Actions...', Object.keys(episodes).slice(0, 10))
+                // console.log(`Search: ${textToSearch.toLowerCase()}, Label: ${episodes[x].labels}, Levebshtein: ${levenshtein(episodes[x].labels, textToSearch.toLowerCase())}`)
+            }
         })
 
         console.log(matches)

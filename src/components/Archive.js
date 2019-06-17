@@ -41,8 +41,6 @@ const mapStateToProps = ({ data }) => {
 
     const { episodes } = data;
 
-    console.log('#################', episodes)
-
     return {
         episodes
     };
