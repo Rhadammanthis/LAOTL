@@ -2,24 +2,29 @@ import React, { Component } from 'react';
 import {
     StyleSheet, Text, View,
     Image, TouchableNativeFeedback,
-    SectionList, Animated, Platform
+    SectionList, Animated, Platform,
+    Dimensions, StatusBar
 } from 'react-native';
+import Fade from './common/Fade'
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
-import {COLORS, CONTENT_TYPE} from './common/Constants'
+import { COLORS, CONTENT_TYPE } from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
 import { clearNewContentValues } from '../actions'
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
+const win = Dimensions.get('window');
 
 class Episode extends Component {
 
     state = {
         scrollPoss: 0,
         sectionsData: [],
-        scrollY: new Animated.Value(0)
+        scrollY: new Animated.Value(0),
+        titleViewHeight: 0,
+        titleVisible: true
     }
 
     sectionsData = []
@@ -28,16 +33,16 @@ class Episode extends Component {
 
         episode = this.props.selectedEpisode;
 
-        console.log('Episode Data', episode)
+        // console.log('Episode Data', episode)
 
         var episodeNotes;
-        for(var i =0 ; i < episode.notes.length; i++)
+        for (var i = 0; i < episode.notes.length; i++)
             episodeNotes += episode.notes[i].length
 
-        for (var category in episode.notes){
+        for (var category in episode.notes) {
             console.log("Category", category)
             var sectionContent = []
-            for(var item in episode.notes[category]){
+            for (var item in episode.notes[category]) {
                 console.log("Item", item);
                 var mappedItem = episode.notes[category][item]
                 mappedItem.nid = item
@@ -46,11 +51,11 @@ class Episode extends Component {
             this.sectionsData.push({
                 key: category,
                 data: sectionContent,
-                renderItem: ({item, section}) => this.selectItemRenderer(item, section)
+                renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
             })
         }
 
-        console.log("Sections list", this.sectionsData[0])
+        // console.log("Sections list", this.sectionsData[0])
 
         // for (var key in episode.notes) {
         //     if (episode.notes.hasOwnProperty(key)) {
@@ -64,6 +69,13 @@ class Episode extends Component {
         // }
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.titleViewHeight !== prevState.titleViewHeight) {
+            console.log("Changed props")
+            this.setState({ titleVisible: true })
+        }
+    }
+
     renderListHeader = () => {
 
         millisToReadable = (millis) => {
@@ -72,29 +84,50 @@ class Episode extends Component {
             min = Math.floor(((sec - (hour * 3600)) / 60))
             sec = sec - (hour * 3600) - (min * 60)
 
-            return hour + ":" + (min < 10 ? "0" + min : min) + ":"  + (sec < 10 ? "0" + sec : sec)
+            return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
         }
 
         return (
-            <View>
-                <Image style={{ flex: 1, height: 250 }} source={{ uri: this.props.selectedEpisode.cover_image }} />
-                <Transparency size={55} />
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <Animated.Text style={[styles.title, {  }]}>
+            <View style={{ flex: 1 }}>
+
+                <Image style={{
+                    borderTopLeftRadius: 30,
+                    alignSelf: 'stretch',
+                    width: win.width,
+                    height: win.height - StatusBar.currentHeight,
+                }} source={{ uri: this.props.selectedEpisode.cover_image }}
+                >
+                    <View style={{ flexDirection: 'column', flex: 1 }}>
+                        <View style={{ flex: 1 }} />
+                        <Transparency size={250} />
+                    </View>
+                </Image>
+
+                <View onLayout={(event) => this.setState({ titleViewHeight: event.nativeEvent.layout.height + 40 })} style={{ flexDirection: 'column', marginTop: - (this.state.titleViewHeight), marginBottom: 40 }}>
+                    <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
-                    <View style={{ flex: 3, flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <Image style={styles.icon} source={require('../images/clock.png')} />
-                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
-                            {millisToReadable(this.props.selectedEpisode.duration)}
-                        </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <Image style={styles.icon} source={require('../images/clock.png')} />
+                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                                {millisToReadable(this.props.selectedEpisode.duration)}
+                            </Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                            <Image style={styles.icon} source={require('../images/clock.png')} />
+                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
+                                {millisToReadable(this.props.selectedEpisode.duration)}
+                            </Text>
+                        </View>
                     </View>
                 </View>
+
                 <Text style={styles.description}>
                     {this.props.selectedEpisode.description}
                 </Text>
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
-                <Text style={[styles.title, { fontWeight: 'normal', marginTop: 0, marginBottom: 10, fontSize: 25 }]}>
+                <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25 }]}>
                     Show Notes
                     </Text>
             </View>
@@ -136,7 +169,7 @@ class Episode extends Component {
 
     render() {
 
-        const animFade =  Animated.event(
+        const animFade = Animated.event(
             [{
                 nativeEvent: { contentOffset: { y: this.state.scrollY } }
             }],
@@ -146,7 +179,7 @@ class Episode extends Component {
         )
 
         var headerFade = this.state.scrollY.interpolate({
-            inputRange: [175, 254, 255],
+            inputRange: [275, 354, 355],
             outputRange: [0, 0.9, 1],
             extrapolate: 'clamp'
         });
@@ -170,7 +203,7 @@ class Episode extends Component {
                     onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
-                <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
+                {/* <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
                     <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.VIDEO) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-play" style={styles.actionButtonIcon} />
@@ -187,7 +220,7 @@ class Episode extends Component {
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-document" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
-                </ActionButton>
+                </ActionButton> */}
             </View>
 
         )
@@ -249,7 +282,6 @@ const styles = StyleSheet.create({
         flex: 2,
         color: 'white',
         marginHorizontal: 10,
-        marginTop: 10
     },
     icon: {
         marginTop: -5,
@@ -258,12 +290,9 @@ const styles = StyleSheet.create({
         tintColor: COLORS.BRIGHT_ORANGE,
     },
     title: {
-        flex: 8,
         color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
-        fontSize: 35,
-        marginTop: -25,
-        marginHorizontal: 10
+        fontSize: 45,
     },
     actionButtonIcon: {
         fontSize: 20,

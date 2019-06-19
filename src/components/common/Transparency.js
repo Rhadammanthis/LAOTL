@@ -1,36 +1,51 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 
+const divisor = 1000;
+const pi = 1 / (divisor);
+
+const step = divisor / 5;
+
 class Transparency extends Component {
 
-    componentWillMount(){
+    componentWillMount() {
 
     }
 
-    renderRow(){
+    renderRow() {
 
-        const size  = this.props.size;
-        const alpha = (1 / size).toFixed(2);
+        const size = this.props.size;
+        let collection = []
 
-        return(
-            [...Array(size)].map((x, i) => {
-                return <View key={i} style={{height: 1, 
-                    backgroundColor: `rgba(23, 22, 18, ${alpha * i})`}}/>
-                }
+        collection.push(0);
+        i = pi;
+        while (i < 1) {
+            collection.push(i);
+            i += pi;
+        }
+        collection.push(1);
+
+        var alpha = 0.15
+
+        return (
+            collection.map((x, i) => {  
+
+                return(
+                <View key={i} style={{
+                    height: size / divisor,
+                    backgroundColor: `rgba(23, 22, 18, ${x})`
+                }} />)
+            }
             )
         )
     }
 
-    render(){
-        const offset = -Math.abs(this.props.size) - 5;
+    render() {
+        const offset = Math.abs(this.props.size) - 5;
 
         return (
-            <View style={{ height: this.size, marginTop: offset }}>
+            <View style={{ height: this.size, }}>
                 {this.renderRow()}
-                {[...Array(5)].map((x, i) =>
-                    <View key={i} style={{height: 1, 
-                        backgroundColor: `rgba(23, 22, 18, 1.0)`}}/>
-                )}
             </View>
         );
     }
