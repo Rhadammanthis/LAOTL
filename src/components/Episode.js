@@ -26,7 +26,7 @@ class Episode extends Component {
         titleViewHeight: 0,
         titleVisible: true,
         isActionButtonVisible: false,
-        fadeAnim:new Animated.Value(0),
+        fadeAnim: new Animated.Value(0),
     }
 
     sectionsData = []
@@ -59,6 +59,8 @@ class Episode extends Component {
                 renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
             })
         }
+
+        console.log("View height", this.state.titleViewHeight)
 
     }
 
@@ -99,13 +101,19 @@ class Episode extends Component {
                     </Animated.Image>
                 </View>
 
-                <Animated.View onLayout={(event) => this.setState({ titleViewHeight: event.nativeEvent.layout.height })} style={{
-                    marginTop: - (this.state.titleViewHeight)
-                    , paddingBottom: 30, zIndex: 2
+                <Animated.View onLayout={(event) => { if (this.state.titleViewHeight > 0) return; this.setState({ titleViewHeight: event.nativeEvent.layout.height }); console.log("Hight recorded") }} style={{
+                    marginTop: - this.state.titleViewHeight,
+                    // transform: [{
+                    //     translateY: this.state.fadeAnim.interpolate({
+                    //       inputRange: [0, 1],
+                    //       outputRange: [0, -this.state.titleViewHeight]  // 0 : 150, 0.5 : 75, 1 : 0
+                    //     }),
+                    //   }],
+                    paddingBottom: 30, zIndex: 2
                 }}>
-                    <View style={{ marginBottom: -(this.state.titleViewHeight) }}>
+                    {this.state.titleViewHeight > 0 ? <View style={{ marginBottom: -(this.state.titleViewHeight) }}>
                         <Transparency size={this.state.titleViewHeight} />
-                    </View>
+                    </View> : null}
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
@@ -167,7 +175,7 @@ class Episode extends Component {
             toValue: 1,
             easing: Easing.back(),
             duration: 500,
-          }).start();
+        }).start();
 
         // this.props.clearNewContentValues()
 
@@ -177,7 +185,7 @@ class Episode extends Component {
 
     _onScroll = Animated.event(
         [{
-            nativeEvent: { contentOffset: { y: this.scrollY } }
+            nativeEvent: { contentOffset: { y: this.state.scrollY } }
         }],
         {
             listener: (event) => {
@@ -190,6 +198,8 @@ class Episode extends Component {
                 }
 
                 const currentOffset = event.nativeEvent.contentOffset.y
+                this.setState({ scrollPosY: currentOffset })
+                console.log("In scroll method", currentOffset)
                 const direction = (currentOffset > 0 && currentOffset > this._listViewOffset)
                     ? 'down'
                     : 'up'
@@ -206,24 +216,74 @@ class Episode extends Component {
     )
 
     // shouldComponentUpdate(nextProps, nextState) {
-    //     return this.state.isActionButtonVisible != nextState.isActionButtonVisible;
+
+    //     console.log("in Lifecycle", nextState.scrollPosY)
+    //     console.log("in Lifecycle - should update", nextState.titleViewHeight)
+
+    //     return nextState.titleViewHeight != this.state.titleViewHeight;
     // }
+
+    // componentDidMount(){
+
+    //     console.log("in Lifecycle - did mount", this.state.titleViewHeight)
+    // }
+
+    _renderNavigationBar(headerFade) {
+        return (
+            // The hacky check for the scrollPossition was to account for a weird bug that would redraw a
+            // fully visible nav bar when updatin the state 
+            <Animated.View style={[styles.navBar, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]}>
+                <Animated.Text style={[styles.navBarTitle, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]} numberOfLines={1}>
+                    {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
+                </Animated.Text>
+            </Animated.View>)
+    }
+
+    _renderNavArrow() {
+        return (
+            <TouchableNativeFeedback style={styles.backButton}
+                onPress={() => { this.props.navigation.goBack() }}>
+                <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
+            </TouchableNativeFeedback>
+        )
+    }
+
+    _renderActionButton() {
+        return this.state.isActionButtonVisible
+            ? <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
+                <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.VIDEO) }} textStyle={{ color: "white", fontSize: 15 }}
+                    textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                    <Icon name="md-play" style={styles.actionButtonIcon} />
+                </ActionButton.Item>
+                <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent(CONTENT_TYPE.MOVIE) }} textStyle={{ color: "white", fontSize: 15 }}
+                    textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                    <Icon name="md-film" style={styles.actionButtonIcon} />
+                </ActionButton.Item>
+                <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent(CONTENT_TYPE.BOOK) }} textStyle={{ color: "white", fontSize: 15 }}
+                    textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                    <Icon name="md-book" style={styles.actionButtonIcon} />
+                </ActionButton.Item>
+                <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent(CONTENT_TYPE.ARTICLE) }} textStyle={{ color: "white", fontSize: 15 }}
+                    textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
+                    <Icon name="md-document" style={styles.actionButtonIcon} />
+                </ActionButton.Item>
+            </ActionButton>
+            : null
+    }
 
     render() {
 
-        headerFade = this.scrollY.interpolate({
+        headerFade = this.state.scrollY.interpolate({
             inputRange: [0, 275, 354, 355],
             outputRange: [0, 0.01, 0.9, 1],
             extrapolate: 'clamp'
         });
-
-        imageTranslate = this.scrollY.interpolate({
+    
+        imageTranslate = this.state.scrollY.interpolate({
             inputRange: [100, 370],
             outputRange: [1, 1.35],
             extrapolate: 'clamp',
         });
-
-        console.log("Header Fade", headerFade);
 
         return (
             <View style={{ flex: 1 }}>
@@ -236,34 +296,9 @@ class Episode extends Component {
                     keyExtractor={(item) => item.title}
                     sections={this.sectionsData}>
                 </AnimatedSectionList>
-                <Animated.View style={[styles.navBar, { opacity: headerFade }]}>
-                    <Animated.Text style={[styles.navBarTitle, { opacity: headerFade }]} numberOfLines={1}>
-                        {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
-                    </Animated.Text>
-                </Animated.View>
-                <TouchableNativeFeedback style={styles.backButton}
-                    onPress={() => { this.props.navigation.goBack() }}>
-                    <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
-                </TouchableNativeFeedback>
-                {this.state.isActionButtonVisible ? <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.VIDEO) }} textStyle={{ color: "white", fontSize: 15 }}
-                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
-                        <Icon name="md-play" style={styles.actionButtonIcon} />
-                    </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Movie" onPress={() => { this.addNewContent(CONTENT_TYPE.MOVIE) }} textStyle={{ color: "white", fontSize: 15 }}
-                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
-                        <Icon name="md-film" style={styles.actionButtonIcon} />
-                    </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Book" onPress={() => { this.addNewContent(CONTENT_TYPE.BOOK) }} textStyle={{ color: "white", fontSize: 15 }}
-                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
-                        <Icon name="md-book" style={styles.actionButtonIcon} />
-                    </ActionButton.Item>
-                    <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Article" onPress={() => { this.addNewContent(CONTENT_TYPE.ARTICLE) }} textStyle={{ color: "white", fontSize: 15 }}
-                        textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
-                        <Icon name="md-document" style={styles.actionButtonIcon} />
-                    </ActionButton.Item>
-                </ActionButton> : null}
-
+                {this._renderNavigationBar(headerFade)}
+                {this._renderNavArrow()}
+                {this._renderActionButton()}
             </View>
 
         )
