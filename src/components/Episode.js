@@ -3,9 +3,8 @@ import {
     StyleSheet, Text, View,
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
-    Dimensions, StatusBar
+    Dimensions, StatusBar, LayoutAnimation, Easing
 } from 'react-native';
-import Fade from './common/Fade'
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
@@ -23,11 +22,17 @@ class Episode extends Component {
         scrollPoss: 0,
         sectionsData: [],
         scrollY: new Animated.Value(0),
+        scrollPosY: 0,
         titleViewHeight: 0,
-        titleVisible: true
+        titleVisible: true,
+        isActionButtonVisible: false,
+        fadeAnim:new Animated.Value(0),
     }
 
     sectionsData = []
+
+    _listViewOffset = win.height * 0.5
+    scrollY = new Animated.Value(0)
 
     componentWillMount() {
 
@@ -55,28 +60,9 @@ class Episode extends Component {
             })
         }
 
-        // console.log("Sections list", this.sectionsData[0])
-
-        // for (var key in episode.notes) {
-        //     if (episode.notes.hasOwnProperty(key)) {
-        //         console.log("KEYS", key)
-        //         this.sectionsData.push({
-        //             key: key,
-        //             data: episode.notes[key],
-        //             renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
-        //         })
-        //     }
-        // }
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.state.titleViewHeight !== prevState.titleViewHeight) {
-            console.log("Changed props")
-            this.setState({ titleVisible: true })
-        }
-    }
-
-    renderListHeader = () => {
+    renderListHeader = (imageTranslate) => {
 
         millisToReadable = (millis) => {
             sec = millis / 1000
@@ -87,23 +73,39 @@ class Episode extends Component {
             return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
         }
 
+        // if(this.state.titleViewHeight > 0){
+        //     Animated.timing(this.state.fadeAnim, {
+        //         toValue: 1,
+        //         easing: Easing.back(),
+        //         duration: 500,
+        //       }).start();
+        // }
+
         return (
             <View style={{ flex: 1 }}>
 
-                <Image style={{
-                    borderTopLeftRadius: 30,
-                    alignSelf: 'stretch',
-                    width: win.width,
-                    height: win.height - StatusBar.currentHeight,
-                }} source={{ uri: this.props.selectedEpisode.cover_image }}
-                >
-                    <View style={{ flexDirection: 'column', flex: 1 }}>
-                        <View style={{ flex: 1 }} />
-                        <Transparency size={250} />
-                    </View>
-                </Image>
+                <View style={{ width: win.width, height: (win.height - StatusBar.currentHeight), overflow: "hidden", zIndex: 1, flex: 1 }}>
+                    <Animated.Image style={{
+                        borderBottomLeftRadius: 20,
+                        borderBottomRightRadius: 20,
+                        alignSelf: 'stretch',
+                        width: win.width,
+                        height: (win.height - StatusBar.currentHeight),
+                        transform: [{ scale: imageTranslate }]
+                    }}
 
-                <View onLayout={(event) => this.setState({ titleViewHeight: event.nativeEvent.layout.height + 40 })} style={{ flexDirection: 'column', marginTop: - (this.state.titleViewHeight), marginBottom: 40 }}>
+                        source={{ uri: this.props.selectedEpisode.cover_image }}
+                    >
+                    </Animated.Image>
+                </View>
+
+                <Animated.View onLayout={(event) => this.setState({ titleViewHeight: event.nativeEvent.layout.height })} style={{
+                    marginTop: - (this.state.titleViewHeight)
+                    , paddingBottom: 30, zIndex: 2
+                }}>
+                    <View style={{ marginBottom: -(this.state.titleViewHeight) }}>
+                        <Transparency size={this.state.titleViewHeight} />
+                    </View>
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
@@ -121,7 +123,7 @@ class Episode extends Component {
                             </Text>
                         </View>
                     </View>
-                </View>
+                </Animated.View>
 
                 <Text style={styles.description}>
                     {this.props.selectedEpisode.description}
@@ -129,7 +131,7 @@ class Episode extends Component {
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
                 <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25 }]}>
                     Show Notes
-                    </Text>
+                </Text>
             </View>
         );
     };
@@ -161,35 +163,75 @@ class Episode extends Component {
 
     addNewContent(type) {
 
-        this.props.clearNewContentValues()
+        Animated.timing(this.state.fadeAnim, {
+            toValue: 1,
+            easing: Easing.back(),
+            duration: 500,
+          }).start();
 
-        const { navigate } = this.props.navigation
-        navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
+        // this.props.clearNewContentValues()
+
+        // const { navigate } = this.props.navigation
+        // navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
     }
+
+    _onScroll = Animated.event(
+        [{
+            nativeEvent: { contentOffset: { y: this.scrollY } }
+        }],
+        {
+            listener: (event) => {
+
+                const CustomLayoutLinear = {
+                    duration: 150,
+                    create: { type: LayoutAnimation.Types.linear, property: LayoutAnimation.Properties.opacity },
+                    update: { type: LayoutAnimation.Types.linear, property: LayoutAnimation.Properties.opacity },
+                    delete: { type: LayoutAnimation.Types.linear, property: LayoutAnimation.Properties.opacity }
+                }
+
+                const currentOffset = event.nativeEvent.contentOffset.y
+                const direction = (currentOffset > 0 && currentOffset > this._listViewOffset)
+                    ? 'down'
+                    : 'up'
+
+                const isActionButtonVisible = direction === 'down'
+                if (isActionButtonVisible !== this.state.isActionButtonVisible) {
+                    LayoutAnimation.configureNext(CustomLayoutLinear)
+                    this.setState({ isActionButtonVisible })
+                }
+
+            },
+            useNativeDriver: true
+        }
+    )
+
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     return this.state.isActionButtonVisible != nextState.isActionButtonVisible;
+    // }
 
     render() {
 
-        const animFade = Animated.event(
-            [{
-                nativeEvent: { contentOffset: { y: this.state.scrollY } }
-            }],
-            {
-                useNativeDriver: true
-            }
-        )
-
-        var headerFade = this.state.scrollY.interpolate({
-            inputRange: [275, 354, 355],
-            outputRange: [0, 0.9, 1],
+        headerFade = this.scrollY.interpolate({
+            inputRange: [0, 275, 354, 355],
+            outputRange: [0, 0.01, 0.9, 1],
             extrapolate: 'clamp'
         });
+
+        imageTranslate = this.scrollY.interpolate({
+            inputRange: [100, 370],
+            outputRange: [1, 1.35],
+            extrapolate: 'clamp',
+        });
+
+        console.log("Header Fade", headerFade);
 
         return (
             <View style={{ flex: 1 }}>
                 <AnimatedSectionList
-                    onScroll={animFade}
+                    onScroll={this._onScroll}
+                    scrollEventThrottle={1} // target 120fps
                     style={{ backgroundColor: COLORS.BACKGROUND }}
-                    ListHeaderComponent={this.renderListHeader(headerFade)}
+                    ListHeaderComponent={this.renderListHeader(imageTranslate)}
                     renderSectionHeader={({ section }) => this.renderSectionHeader(section)}
                     keyExtractor={(item) => item.title}
                     sections={this.sectionsData}>
@@ -203,7 +245,7 @@ class Episode extends Component {
                     onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
                 </TouchableNativeFeedback>
-                {/* <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
+                {this.state.isActionButtonVisible ? <ActionButton buttonColor="rgba(246,80,40,1)" bgColor="rgba(0,0,0,0.6)" offsetX={20} offsetY={20} spacing={15} fixNativeFeedbackRadius={true}>
                     <ActionButton.Item buttonColor='rgba(246,80,40,1)' title="Video" onPress={() => { this.addNewContent(CONTENT_TYPE.VIDEO) }} textStyle={{ color: "white", fontSize: 15 }}
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-play" style={styles.actionButtonIcon} />
@@ -220,7 +262,8 @@ class Episode extends Component {
                         textContainerStyle={{ backgroundColor: 'transparent', borderWidth: 0 }}>
                         <Icon name="md-document" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
-                </ActionButton> */}
+                </ActionButton> : null}
+
             </View>
 
         )
