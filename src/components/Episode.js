@@ -19,14 +19,13 @@ const win = Dimensions.get('window');
 class Episode extends Component {
 
     state = {
-        scrollPoss: 0,
-        sectionsData: [],
         scrollY: new Animated.Value(0),
         scrollPosY: 0,
         titleViewHeight: 0,
-        titleVisible: true,
         isActionButtonVisible: false,
         fadeAnim: new Animated.Value(0),
+        fadeBackground: new Animated.Value(0),
+        scrollEnabled: false
     }
 
     sectionsData = []
@@ -37,12 +36,6 @@ class Episode extends Component {
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
-
-        // console.log('Episode Data', episode)
-
-        var episodeNotes;
-        for (var i = 0; i < episode.notes.length; i++)
-            episodeNotes += episode.notes[i].length
 
         for (var category in episode.notes) {
             console.log("Category", category)
@@ -59,9 +52,6 @@ class Episode extends Component {
                 renderItem: ({ item, section }) => this.selectItemRenderer(item, section)
             })
         }
-
-        console.log("View height", this.state.titleViewHeight)
-
     }
 
     renderListHeader = (imageTranslate) => {
@@ -74,14 +64,6 @@ class Episode extends Component {
 
             return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
         }
-
-        // if(this.state.titleViewHeight > 0){
-        //     Animated.timing(this.state.fadeAnim, {
-        //         toValue: 1,
-        //         easing: Easing.back(),
-        //         duration: 500,
-        //       }).start();
-        // }
 
         return (
             <View style={{ flex: 1 }}>
@@ -101,19 +83,22 @@ class Episode extends Component {
                     </Animated.Image>
                 </View>
 
+                {this.state.titleViewHeight > 0
+                ? <Animated.View style={{ zIndex: 2, marginTop: -(this.state.titleViewHeight), opacity: this.state.fadeBackground }}>
+                    <Transparency size={this.state.titleViewHeight} />
+                </Animated.View>
+                : null}
+
                 <Animated.View onLayout={(event) => { if (this.state.titleViewHeight > 0) return; this.setState({ titleViewHeight: event.nativeEvent.layout.height }); console.log("Hight recorded") }} style={{
-                    marginTop: - this.state.titleViewHeight,
-                    // transform: [{
-                    //     translateY: this.state.fadeAnim.interpolate({
-                    //       inputRange: [0, 1],
-                    //       outputRange: [0, -this.state.titleViewHeight]  // 0 : 150, 0.5 : 75, 1 : 0
-                    //     }),
-                    //   }],
-                    paddingBottom: 30, zIndex: 2
+                    marginTop: 0,
+                    transform: [{
+                        translateY: this.state.fadeAnim.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0, -this.state.titleViewHeight]  // 0 : 150, 0.5 : 75, 1 : 0
+                        }),
+                    }],
+                    paddingBottom: 50, zIndex: 2
                 }}>
-                    {this.state.titleViewHeight > 0 ? <View style={{ marginBottom: -(this.state.titleViewHeight) }}>
-                        <Transparency size={this.state.titleViewHeight} />
-                    </View> : null}
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
@@ -131,9 +116,9 @@ class Episode extends Component {
                             </Text>
                         </View>
                     </View>
-                </Animated.View>
+                </Animated.View>              
 
-                <Text style={styles.description}>
+                <Text style={[styles.description, {marginTop: - this.state.titleViewHeight}]}>
                     {this.props.selectedEpisode.description}
                 </Text>
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
@@ -171,16 +156,10 @@ class Episode extends Component {
 
     addNewContent(type) {
 
-        Animated.timing(this.state.fadeAnim, {
-            toValue: 1,
-            easing: Easing.back(),
-            duration: 500,
-        }).start();
+        this.props.clearNewContentValues()
 
-        // this.props.clearNewContentValues()
-
-        // const { navigate } = this.props.navigation
-        // navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
+        const { navigate } = this.props.navigation
+        navigate('AddNew', { contentType: type, firebaseId: this.props.navigation.state.params.firebaseId })
     }
 
     _onScroll = Animated.event(
@@ -215,18 +194,27 @@ class Episode extends Component {
         }
     )
 
-    // shouldComponentUpdate(nextProps, nextState) {
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        console.log("Updated")
+        var interval = setTimeout(() => {
 
-    //     console.log("in Lifecycle", nextState.scrollPosY)
-    //     console.log("in Lifecycle - should update", nextState.titleViewHeight)
-
-    //     return nextState.titleViewHeight != this.state.titleViewHeight;
-    // }
-
-    // componentDidMount(){
-
-    //     console.log("in Lifecycle - did mount", this.state.titleViewHeight)
-    // }
+            Animated.parallel([
+                Animated.timing(this.state.fadeAnim, {
+                    toValue: 1,
+                    easing: Easing.out(Easing.back()),
+                    duration: 700,
+                }),
+                Animated.timing(this.state.fadeBackground, {
+                    toValue: 1,
+                    duration: 500,
+                }),
+              ]).start((result) => { 
+                  this.setState({scrollEnabled: true})
+                clearTimeout(interval) 
+            });
+        }, 500)
+    }
 
     _renderNavigationBar(headerFade) {
         return (
@@ -278,7 +266,7 @@ class Episode extends Component {
             outputRange: [0, 0.01, 0.9, 1],
             extrapolate: 'clamp'
         });
-    
+
         imageTranslate = this.state.scrollY.interpolate({
             inputRange: [100, 370],
             outputRange: [1, 1.35],
@@ -288,6 +276,7 @@ class Episode extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <AnimatedSectionList
+                    scrollEnabled={this.state.scrollEnabled}
                     onScroll={this._onScroll}
                     scrollEventThrottle={1} // target 120fps
                     style={{ backgroundColor: COLORS.BACKGROUND }}
