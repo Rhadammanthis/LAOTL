@@ -57,24 +57,23 @@ var mainFlow = TabNavigator(
 
 export default StackNavigator(
 	{
-		Episode: {
-			screen: Episode,
-			navigationOptions: ({ navigation }) => ({
-				header: null
-			})
+		SplashScreen: {
+			screen: SplashScreen,
+			navigationOptions: {
+				header: () => null
+			}
 		},
-		
 		MainFlow: {
 			screen: mainFlow,
 			navigationOptions: ({ navigation }) => ({
 				title: 'Last App On The Left',
 			})
 		},
-		SplashScreen: {
-			screen: SplashScreen,
-			navigationOptions: {
-				header: () => null
-			}
+		Episode: {
+			screen: Episode,
+			navigationOptions: ({ navigation }) => ({
+				header: null
+			})
 		},
 		AddNew: {
 			screen: AddNew,
