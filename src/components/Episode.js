@@ -210,7 +210,8 @@ class Episode extends Component {
                     duration: 500,
                 }),
               ]).start((result) => { 
-                  this.setState({scrollEnabled: true})
+                if(this.state.scrollEnabled == false)
+                    this.setState({scrollEnabled: true})
                 clearTimeout(interval) 
             });
         }, 500)
