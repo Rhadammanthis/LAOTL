@@ -3,7 +3,8 @@ import {
     StyleSheet, Text, View,
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
-    Dimensions, StatusBar, LayoutAnimation, Easing
+    Dimensions, StatusBar, LayoutAnimation, Easing,
+    Linking
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -36,6 +37,7 @@ class Episode extends Component {
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
+        eid = "-LhH5MUS8NVAyXF1xaOV"
 
         for (var category in episode.notes) {
             console.log("Category", category)
@@ -56,15 +58,6 @@ class Episode extends Component {
 
     renderListHeader = (imageTranslate) => {
 
-        millisToReadable = (millis) => {
-            sec = millis / 1000
-            hour = Math.floor(sec / 3600);
-            min = Math.floor(((sec - (hour * 3600)) / 60))
-            sec = sec - (hour * 3600) - (min * 60)
-
-            return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
-        }
-
         return (
             <View style={{ flex: 1 }}>
 
@@ -84,10 +77,10 @@ class Episode extends Component {
                 </View>
 
                 {this.state.titleViewHeight > 0
-                ? <Animated.View style={{ zIndex: 2, marginTop: -(this.state.titleViewHeight), opacity: this.state.fadeBackground }}>
-                    <Transparency size={this.state.titleViewHeight} />
-                </Animated.View>
-                : null}
+                    ? <Animated.View style={{ zIndex: 2, marginTop: -(this.state.titleViewHeight), opacity: this.state.fadeBackground }}>
+                        <Transparency size={this.state.titleViewHeight} />
+                    </Animated.View>
+                    : null}
 
                 <Animated.View onLayout={(event) => { if (this.state.titleViewHeight > 0) return; this.setState({ titleViewHeight: event.nativeEvent.layout.height }); console.log("Hight recorded") }} style={{
                     marginTop: 0,
@@ -102,23 +95,10 @@ class Episode extends Component {
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
                         {this.props.selectedEpisode.title}
                     </Animated.Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
-                                {millisToReadable(this.props.selectedEpisode.duration)}
-                            </Text>
-                        </View>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
-                                {millisToReadable(this.props.selectedEpisode.duration)}
-                            </Text>
-                        </View>
-                    </View>
-                </Animated.View>              
+                    {this._renderAtts()}
+                </Animated.View>
 
-                <Text style={[styles.description, {marginTop: - this.state.titleViewHeight}]}>
+                <Text style={[styles.description, { marginTop: - this.state.titleViewHeight }]}>
                     {this.props.selectedEpisode.description}
                 </Text>
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
@@ -209,12 +189,52 @@ class Episode extends Component {
                     toValue: 1,
                     duration: 500,
                 }),
-              ]).start((result) => { 
-                if(this.state.scrollEnabled == false)
-                    this.setState({scrollEnabled: true})
-                clearTimeout(interval) 
+            ]).start((result) => {
+                if (this.state.scrollEnabled == false)
+                    this.setState({ scrollEnabled: true })
+                clearTimeout(interval)
             });
         }, 500)
+    }
+
+    _renderAtts() {
+
+        millisToReadable = (millis) => {
+            sec = millis / 1000
+            hour = Math.floor(sec / 3600);
+            min = Math.floor(((sec - (hour * 3600)) / 60))
+            sec = sec - (hour * 3600) - (min * 60)
+
+            return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
+        }
+
+        return (
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Image style={styles.icon} source={require('../images/clock.png')} />
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        {millisToReadable(this.props.selectedEpisode.duration)}
+                    </Text>
+                </View>
+                <TouchableNativeFeedback onPress={() => { Linking.openURL(this.props.selectedEpisode.audio_url) }} >
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center",  }}>
+                        <Image style={styles.icon} source={require('../images/speaker.png')} />
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                            Listen
+                </Text>
+                    </View>
+
+                </TouchableNativeFeedback>
+                {this.props.selectedEpisode.gold_star 
+                ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        Gold Star
+                </Text>
+                </View> 
+                : null}
+            </View>
+        )
     }
 
     _renderNavigationBar(headerFade) {
