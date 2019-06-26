@@ -4,7 +4,7 @@ import {
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
     Dimensions, StatusBar, LayoutAnimation, Easing,
-    Linking
+    Linking, TouchableOpacity
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -37,7 +37,7 @@ class Episode extends Component {
     componentWillMount() {
 
         episode = this.props.selectedEpisode;
-        eid = "-LhH5MUS8NVAyXF1xaOV"
+        eid = "-LgyE_4sNP4WMb2rufDL"
 
         for (var category in episode.notes) {
             console.log("Category", category)
@@ -71,7 +71,7 @@ class Episode extends Component {
                         transform: [{ scale: imageTranslate }]
                     }}
 
-                        source={{ uri: this.props.selectedEpisode.cover_image }}
+                        source={{ uri: episode.cover_image }}
                     >
                     </Animated.Image>
                 </View>
@@ -90,16 +90,18 @@ class Episode extends Component {
                             outputRange: [0, -this.state.titleViewHeight]  // 0 : 150, 0.5 : 75, 1 : 0
                         }),
                     }],
-                    paddingBottom: 50, zIndex: 2
+                    paddingBottom: 50,
+                    zIndex: 2,
+                    marginBottom: - this.state.titleViewHeight
                 }}>
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
-                        {this.props.selectedEpisode.title}
+                        {episode.title}
                     </Animated.Text>
                     {this._renderAtts()}
                 </Animated.View>
-
-                <Text style={[styles.description, { marginTop: - this.state.titleViewHeight }]}>
-                    {this.props.selectedEpisode.description}
+                {this._renderSeriesEpisodes()}
+                <Text style={[styles.description]}>
+                    {episode.description}
                 </Text>
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
                 <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25 }]}>
@@ -213,11 +215,11 @@ class Episode extends Component {
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/clock.png')} />
                     <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
-                        {millisToReadable(this.props.selectedEpisode.duration)}
+                        {millisToReadable(episode.duration)}
                     </Text>
                 </View>
-                <TouchableNativeFeedback onPress={() => { Linking.openURL(this.props.selectedEpisode.audio_url) }} >
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center",  }}>
+                <TouchableNativeFeedback onPress={() => { Linking.openURL(episode.audio_url) }} >
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                         <Image style={styles.icon} source={require('../images/speaker.png')} />
                         <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
                             Listen
@@ -225,14 +227,47 @@ class Episode extends Component {
                     </View>
 
                 </TouchableNativeFeedback>
-                {this.props.selectedEpisode.gold_star 
-                ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                    <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
-                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
-                        Gold Star
+                {episode.gold_star
+                    ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                            Gold Star
                 </Text>
-                </View> 
-                : null}
+                    </View>
+                    : null}
+            </View>
+        )
+    }
+
+    _renderSeriesEpisodes() {
+        if (episode.part_of_series == null)
+            return null
+
+        var currentEpisode = episode.series_episodes.indexOf(eid)
+        var mappedItems = episode.series_episodes.map((episode, i) => {
+
+            var romanNumber = ""
+            for (let index = 0; index < i + 1; index++) {
+                romanNumber += "I"
+            }
+
+            return i == currentEpisode
+                ? <View style={{ flex: 1, alignItems: "center" }}>
+                    <Text style={{ color: "white", textAlign: 'center', fontSize: 22, borderRadius: 40, backgroundColor: COLORS.BRIGHT_ORANGE, width: 40, height: 40, padding: 5 }}>{romanNumber}</Text>
+                </View>
+                : <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: COLORS.BRIGHT_ORANGE, fontSize: 22 }}>{romanNumber}</Text>
+                </View>
+        })
+
+        return (
+            <View style={{ flexDirection: "row", flex: 1, marginVertical: 5 }}>
+                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: COLORS.BRIGHT_ORANGE }}> EP.</Text>
+                </View>
+                <View style={{ flexDirection: "row", flex: 9, justifyContent: 'space-between' }}>
+                    {mappedItems}
+                </View>
             </View>
         )
     }
@@ -243,7 +278,7 @@ class Episode extends Component {
             // fully visible nav bar when updatin the state 
             <Animated.View style={[styles.navBar, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]}>
                 <Animated.Text style={[styles.navBarTitle, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]} numberOfLines={1}>
-                    {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
+                    {episode.number} - {episode.title}
                 </Animated.Text>
             </Animated.View>)
     }
@@ -289,7 +324,7 @@ class Episode extends Component {
         });
 
         imageTranslate = this.state.scrollY.interpolate({
-            inputRange: [100, 370],
+            inputRange: [60, 370],
             outputRange: [1, 1.35],
             extrapolate: 'clamp',
         });
@@ -372,7 +407,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     icon: {
-        marginTop: -5,
         height: 25,
         width: 25,
         tintColor: COLORS.BRIGHT_ORANGE,
