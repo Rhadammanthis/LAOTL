@@ -4,7 +4,7 @@ import {
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
     Dimensions, StatusBar, LayoutAnimation, Easing,
-    Linking, TouchableOpacity
+    Linking, TouchableOpacity, ScrollView
 } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -100,11 +100,13 @@ class Episode extends Component {
                     {this._renderAtts()}
                 </Animated.View>
                 {this._renderSeriesEpisodes()}
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginHorizontal: 10}}>Description</Text>
                 <Text style={[styles.description]}>
                     {episode.description}
                 </Text>
+                {this._renderTags()}
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
-                <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25 }]}>
+                <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25, marginHorizontal: 10 }]}>
                     Show Notes
                 </Text>
             </View>
@@ -252,22 +254,46 @@ class Episode extends Component {
             }
 
             return i == currentEpisode
-                ? <View style={{ flex: 1, alignItems: "center" }}>
-                    <Text style={{ color: "white", textAlign: 'center', fontSize: 22, borderRadius: 40, backgroundColor: COLORS.BRIGHT_ORANGE, width: 40, height: 40, padding: 5 }}>{romanNumber}</Text>
+                ? <View key={i} style={{ flex: 1, alignItems: "center" }}>
+                    <Text style={{ color: "white", textAlign: 'center', fontSize: 22, borderRadius: 40, backgroundColor: COLORS.MUTE_ORANGE, width: 40, height: 40, padding: 5 }}>{romanNumber}</Text>
                 </View>
-                : <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ color: COLORS.BRIGHT_ORANGE, fontSize: 22 }}>{romanNumber}</Text>
+                : <View key={i} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, fontSize: 22 }}>{romanNumber}</Text>
                 </View>
         })
 
         return (
             <View style={{ flexDirection: "row", flex: 1, marginVertical: 5 }}>
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ color: COLORS.BRIGHT_ORANGE }}> EP.</Text>
+                    <Text style={{ color: COLORS.MUTE_ORANGE }}> EP.</Text>
                 </View>
                 <View style={{ flexDirection: "row", flex: 9, justifyContent: 'space-between' }}>
                     {mappedItems}
                 </View>
+            </View>
+        )
+    }
+
+    _renderTags() {
+
+        var topRated = []
+
+        for (var tag in episode.tags) {
+            console.log("Tag", tag)
+  
+            topRated.push(
+                <View key={tag} style={{backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, paddingHorizontal: 5, marginHorizontal: 5}}>
+                    <Text style={{ color: "white"}}> {episode.tags[tag].title}</Text>
+                </View>
+            )
+        }
+
+        return(
+            <View style={{ marginVertical: 5, marginHorizontal: 5}}>
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5}}>Tags</Text>
+                <ScrollView horizontal={true} contentContainerStyle={{flexDirection: "row", justifyContent: 'flex-start'}}>
+                    {topRated}
+                </ScrollView>
             </View>
         )
     }
