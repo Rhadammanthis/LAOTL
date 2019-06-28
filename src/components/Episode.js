@@ -36,6 +36,8 @@ class Episode extends Component {
 
     componentWillMount() {
 
+        console.log("Screen height", win.height)
+
         episode = this.props.selectedEpisode;
         eid = "-LgyE_4sNP4WMb2rufDL"
 
@@ -282,7 +284,7 @@ class Episode extends Component {
             console.log("Tag", tag)
   
             topRated.push(
-                <View key={tag} style={{backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, paddingHorizontal: 5, marginHorizontal: 5}}>
+                <View key={tag} style={{backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5}}>
                     <Text style={{ color: "white"}}> {episode.tags[tag].title}</Text>
                 </View>
             )
@@ -291,7 +293,7 @@ class Episode extends Component {
         return(
             <View style={{ marginVertical: 5, marginHorizontal: 5}}>
                 <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5}}>Tags</Text>
-                <ScrollView horizontal={true} contentContainerStyle={{flexDirection: "row", justifyContent: 'flex-start'}}>
+                <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{flexDirection: "row", justifyContent: 'flex-start'}}>
                     {topRated}
                 </ScrollView>
             </View>
@@ -344,7 +346,7 @@ class Episode extends Component {
     render() {
 
         headerFade = this.state.scrollY.interpolate({
-            inputRange: [0, 275, 354, 355],
+            inputRange: [0, win.height * 0.55, (win.height * 0.55) + 79, (win.height * 0.55) + 80],
             outputRange: [0, 0.01, 0.9, 1],
             extrapolate: 'clamp'
         });
