@@ -102,7 +102,7 @@ class Episode extends Component {
                     {this._renderAtts()}
                 </Animated.View>
                 {this._renderSeriesEpisodes()}
-                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginHorizontal: 10}}>Description</Text>
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginHorizontal: 10 }}>Description</Text>
                 <Text style={[styles.description]}>
                     {episode.description}
                 </Text>
@@ -183,24 +183,26 @@ class Episode extends Component {
     componentDidUpdate(prevProps) {
         // Typical usage (don't forget to compare props):
         console.log("Updated")
-        var interval = setTimeout(() => {
-
-            Animated.parallel([
-                Animated.timing(this.state.fadeAnim, {
-                    toValue: 1,
-                    easing: Easing.out(Easing.back()),
-                    duration: 700,
-                }),
-                Animated.timing(this.state.fadeBackground, {
-                    toValue: 1,
-                    duration: 500,
-                }),
-            ]).start((result) => {
-                if (this.state.scrollEnabled == false)
-                    this.setState({ scrollEnabled: true })
-                clearTimeout(interval)
-            });
-        }, 500)
+        if (this.state.titleViewHeight > 0)
+            var interval = setTimeout(() => {
+                Animated.parallel([
+                    Animated.timing(this.state.fadeAnim, {
+                        toValue: 1,
+                        easing: Easing.out(Easing.back()),
+                        duration: 700,
+                        useNativeDriver: true
+                    }),
+                    Animated.timing(this.state.fadeBackground, {
+                        toValue: 1,
+                        duration: 500,
+                        useNativeDriver: true
+                    }),
+                ]).start((result) => {
+                    if (this.state.scrollEnabled == false)
+                        this.setState({ scrollEnabled: true })
+                    clearTimeout(interval)
+                });
+            }, 500)
     }
 
     _renderAtts() {
@@ -217,20 +219,17 @@ class Episode extends Component {
         return (
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Image style={styles.icon} source={require('../images/hot.png')} />
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        {episode.category}
+                    </Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/clock.png')} />
                     <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
                         {millisToReadable(episode.duration)}
                     </Text>
                 </View>
-                <TouchableNativeFeedback onPress={() => { Linking.openURL(episode.audio_url) }} >
-                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                        <Image style={styles.icon} source={require('../images/speaker.png')} />
-                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
-                            Listen
-                </Text>
-                    </View>
-
-                </TouchableNativeFeedback>
                 {episode.gold_star
                     ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                         <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
@@ -282,18 +281,18 @@ class Episode extends Component {
 
         for (var tag in episode.tags) {
             console.log("Tag", tag)
-  
+
             topRated.push(
-                <View key={tag} style={{backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5}}>
-                    <Text style={{ color: "white"}}> {episode.tags[tag].title}</Text>
+                <View key={tag} style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
+                    <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
                 </View>
             )
         }
 
-        return(
-            <View style={{ marginVertical: 5, marginHorizontal: 5}}>
-                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5}}>Tags</Text>
-                <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{flexDirection: "row", justifyContent: 'flex-start'}}>
+        return (
+            <View style={{ marginVertical: 5, marginHorizontal: 5 }}>
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5 }}>Tags</Text>
+                <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", justifyContent: 'flex-start' }}>
                     {topRated}
                 </ScrollView>
             </View>
@@ -313,10 +312,17 @@ class Episode extends Component {
 
     _renderNavArrow() {
         return (
-            <TouchableNativeFeedback style={styles.backButton}
-                onPress={() => { this.props.navigation.goBack() }}>
-                <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
-            </TouchableNativeFeedback>
+            <View style={{ flexDirection: "row", flex: 1, width: win.width, position: "absolute", top: 0, height: 50, alignItems: "center" }}>
+                <TouchableNativeFeedback
+                    onPress={() => { this.props.navigation.goBack() }}>
+                    <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
+                </TouchableNativeFeedback>
+                <View style={{ flex: 1 }} />
+                <TouchableNativeFeedback
+                    onPress={() => { Linking.openURL(episode.audio_url) }}>
+                    <Image style={styles.backButtonImage} source={require('../images/speaker.png')} />
+                </TouchableNativeFeedback>
+            </View>
         )
     }
 
@@ -422,12 +428,7 @@ const styles = StyleSheet.create({
         height: 25,
         width: 25,
         tintColor: COLORS.BRIGHT_ORANGE,
-        marginLeft: 5,
-        position: 'absolute',
-        top: 13,
-        bottom: 0,
-        left: 0,
-        right: 0,
+        marginHorizontal: 5,
     },
     description: {
         flex: 2,
