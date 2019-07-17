@@ -9,6 +9,7 @@ import {
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
+import MenuIconButton from './common/MenuIconButton';
 import { COLORS, CONTENT_TYPE } from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
@@ -65,6 +66,8 @@ class Episode extends Component {
 
                 <View style={{ width: win.width, height: (win.height - StatusBar.currentHeight), overflow: "hidden", zIndex: 1, flex: 1 }}>
                     <Animated.Image style={{
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
                         borderBottomLeftRadius: 20,
                         borderBottomRightRadius: 20,
                         alignSelf: 'stretch',
@@ -169,7 +172,12 @@ class Episode extends Component {
                     ? 'down'
                     : 'up'
 
-                const isActionButtonVisible = direction === 'down'
+                const paddingToBottom = 20;
+
+                const reachedBottom = (event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y >=
+                    event.nativeEvent.contentSize.height - paddingToBottom)
+
+                const isActionButtonVisible = direction === 'down' || reachedBottom
                 if (isActionButtonVisible !== this.state.isActionButtonVisible) {
                     LayoutAnimation.configureNext(CustomLayoutLinear)
                     this.setState({ isActionButtonVisible })
@@ -243,7 +251,7 @@ class Episode extends Component {
     }
 
     _renderSeriesEpisodes() {
-        if (episode.part_of_series == null)
+        if (episode.part_of_series == null || episode.series_episodes == null)
             return null
 
         var currentEpisode = episode.series_episodes.indexOf(eid)
@@ -313,15 +321,15 @@ class Episode extends Component {
     _renderNavArrow() {
         return (
             <View style={{ flexDirection: "row", flex: 1, width: win.width, position: "absolute", top: 0, height: 50, alignItems: "center" }}>
-                <TouchableNativeFeedback
+                <TouchableOpacity
                     onPress={() => { this.props.navigation.goBack() }}>
                     <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
-                </TouchableNativeFeedback>
+                </TouchableOpacity>
                 <View style={{ flex: 1 }} />
-                <TouchableNativeFeedback
+                <TouchableOpacity
                     onPress={() => { Linking.openURL(episode.audio_url) }}>
                     <Image style={styles.backButtonImage} source={require('../images/speaker.png')} />
-                </TouchableNativeFeedback>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -402,7 +410,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
-        marginLeft: 35
+        marginLeft: 35,
+        marginRight: 35
     },
     addContent: {
         position: 'absolute',
