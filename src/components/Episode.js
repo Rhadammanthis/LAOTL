@@ -4,16 +4,18 @@ import {
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
     Dimensions, StatusBar, LayoutAnimation, Easing,
-    Linking, TouchableOpacity, ScrollView
+    Linking, TouchableOpacity, ScrollView, Button,
+    TextInput
 } from 'react-native';
+// import Modal from 'react-native-modal';
+import SingleChoiceModal from '../components/common/SingleChoiceModal';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
-import MenuIconButton from './common/MenuIconButton';
 import { COLORS, CONTENT_TYPE } from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
-import { clearNewContentValues } from '../actions'
+import { clearNewContentValues, commendTag } from '../actions'
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 const win = Dimensions.get('window');
@@ -27,7 +29,9 @@ class Episode extends Component {
         isActionButtonVisible: false,
         fadeAnim: new Animated.Value(0),
         fadeBackground: new Animated.Value(0),
-        scrollEnabled: false
+        scrollEnabled: false,
+        modalVisible: false,
+        selectedTagId: null
     }
 
     sectionsData = []
@@ -37,16 +41,16 @@ class Episode extends Component {
 
     componentWillMount() {
 
-        console.log("Screen height", win.height)
+        // console.log("Screen height", win.height)
 
         episode = this.props.selectedEpisode;
         eid = "-LgyE_4sNP4WMb2rufDL"
 
         for (var category in episode.notes) {
-            console.log("Category", category)
+            // console.log("Category", category)
             var sectionContent = []
             for (var item in episode.notes[category]) {
-                console.log("Item", item);
+                // console.log("Item", item);
                 var mappedItem = episode.notes[category][item]
                 mappedItem.nid = item
                 sectionContent.push(mappedItem)
@@ -167,7 +171,7 @@ class Episode extends Component {
 
                 const currentOffset = event.nativeEvent.contentOffset.y
                 this.setState({ scrollPosY: currentOffset })
-                console.log("In scroll method", currentOffset)
+                // console.log("In scroll method", currentOffset)
                 const direction = (currentOffset > 0 && currentOffset > this._listViewOffset)
                     ? 'down'
                     : 'up'
@@ -286,22 +290,38 @@ class Episode extends Component {
     _renderTags() {
 
         var topRated = []
+        var tags = Object.keys(episode.tags)
 
-        for (var tag in episode.tags) {
-            console.log("Tag", tag)
+        tags.forEach((tag,i) => {
+
+            // console.log("Tag", tag)
 
             topRated.push(
-                <View key={tag} style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
-                    <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
-                </View>
+                <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
+                    <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
+                        <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
+                    </View>
+                </TouchableOpacity>
             )
-        }
+
+        }) 
 
         return (
             <View style={{ marginVertical: 5, marginHorizontal: 5 }}>
                 <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5 }}>Tags</Text>
                 <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", justifyContent: 'flex-start' }}>
                     {topRated}
+                    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: 5 }}>
+                        <TouchableOpacity onPress={() => { }} style={{
+                            width: 25, height: 25, backgroundColor: COLORS.MUTE_ORANGE,
+                            borderRadius: 12.5, alignItems: "center", justifyContent: "center"
+                        }}>
+                            <Image style={{
+                                height: 15,
+                                width: 15, tintColor: "white"
+                            }} source={require('../images/add_white.png')} />
+                        </TouchableOpacity>
+                    </View>
                 </ScrollView>
             </View>
         )
@@ -332,6 +352,10 @@ class Episode extends Component {
                 </TouchableOpacity>
             </View>
         )
+    }
+
+    setModalVisible(visible) {
+        this.setState({ modalVisible: visible });
     }
 
     _renderActionButton() {
@@ -386,6 +410,12 @@ class Episode extends Component {
                 {this._renderNavigationBar(headerFade)}
                 {this._renderNavArrow()}
                 {this._renderActionButton()}
+                <SingleChoiceModal
+                    message={"Is this tag helpffull? Help us improve!"}
+                    onPossitive={() => {this.props.commendTag(null, null, this.state.selectedTagId, episode.part_of_series)}} 
+                    onNegative={() => {console.log("Negative pressed")}}
+                    visible={this.state.modalVisible} 
+                    onClosed={() => this.setState({ modalVisible: false })} />
             </View>
 
         )
@@ -470,4 +500,4 @@ const mapStateToProps = ({ data }) => {
     };
 };
 
-export default connect(mapStateToProps, { clearNewContentValues })(Episode)
+export default connect(mapStateToProps, { clearNewContentValues, commendTag })(Episode)
