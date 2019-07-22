@@ -84,10 +84,10 @@ class SingleChoiceModal extends Component {
                                         }),
                                     }],
                                 }]} onPress={() => this.onPressed(1, onPossitive)}>
-                                <Image style={style.image} source={require('../../images/star.png')} />
+                                <Image style={styles.image} source={require('../../images/check.png')} />
                             </AnimatedTouchableOpacity>
                             <AnimatedTouchableOpacity onLayout={(event) => { this.setState({ x1: event.nativeEvent.layout.x }); console.log("View2", event.nativeEvent.layout.x) }}
-                                style={[styles.button, {
+                                style={[styles.button, { borderColor: COLORS.RED, 
                                     opacity: this._animatedView2, transform: [{
                                         translateX: this._animTranlation.interpolate({
                                             inputRange: [0, 1],
@@ -95,7 +95,7 @@ class SingleChoiceModal extends Component {
                                         }),
                                     }],
                                 }]} onPress={() => this.onPressed(2, onNegative)}>
-                                <Image style={style.image} source={require('../../images/star.png')} />
+                                <Image style={[styles.image, {tintColor: COLORS.RED }]} source={require('../../images/cross.png')} />
                             </AnimatedTouchableOpacity>
                         </View>
                     </View>
@@ -120,11 +120,16 @@ const styles = StyleSheet.create({
     image: {
         height: 40,
         width: 40,
-        tintColor: COLORS.RED,
+        tintColor: COLORS.GREEN,
     },
     button: {
         height: 50,
-        width: 50, borderRadius: 25, borderColor: COLORS.RED, borderWidth: 2, alignItems: "center", justifyContent: "center",
+        width: 50, 
+        borderRadius: 25, 
+        borderColor: COLORS.GREEN, 
+        borderWidth: 2, 
+        alignItems: "center", 
+        justifyContent: "center",
     }
 
 })

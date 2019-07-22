@@ -194,7 +194,6 @@ class Episode extends Component {
 
     componentDidUpdate(prevProps) {
         // Typical usage (don't forget to compare props):
-        console.log("Updated")
         if (this.state.titleViewHeight > 0)
             var interval = setTimeout(() => {
                 Animated.parallel([
