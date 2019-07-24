@@ -9,13 +9,14 @@ import {
 } from 'react-native';
 // import Modal from 'react-native-modal';
 import SingleChoiceModal from '../components/common/SingleChoiceModal';
+import TextInputModal from '../components/common/TextInputModal';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
 import { COLORS, CONTENT_TYPE } from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
-import { clearNewContentValues, commendTag } from '../actions'
+import { clearNewContentValues, commendTag, addTag } from '../actions'
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 const win = Dimensions.get('window');
@@ -31,6 +32,7 @@ class Episode extends Component {
         fadeBackground: new Animated.Value(0),
         scrollEnabled: false,
         modalVisible: false,
+        textInputModalVisible: false,
         selectedTagId: null
     }
 
@@ -311,7 +313,7 @@ class Episode extends Component {
                 <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", justifyContent: 'flex-start' }}>
                     {topRated}
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: 5 }}>
-                        <TouchableOpacity onPress={() => { }} style={{
+                        <TouchableOpacity onPress={() => { this.setTextInputModalVisible(true) }} style={{
                             width: 25, height: 25, backgroundColor: COLORS.MUTE_ORANGE,
                             borderRadius: 12.5, alignItems: "center", justifyContent: "center"
                         }}>
@@ -355,6 +357,10 @@ class Episode extends Component {
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
+    }
+
+    setTextInputModalVisible(visible) {
+        this.setState({ textInputModalVisible: visible });
     }
 
     _renderActionButton() {
@@ -410,11 +416,20 @@ class Episode extends Component {
                 {this._renderNavArrow()}
                 {this._renderActionButton()}
                 <SingleChoiceModal
-                    message={"Is this tag helpffull? Help us improve!"}
+                    message="Is this tag helpffull? Help us improve!"
                     onPossitive={() => {this.props.commendTag(null, null, this.state.selectedTagId, episode.part_of_series)}} 
                     onNegative={() => {console.log("Negative pressed")}}
                     visible={this.state.modalVisible} 
-                    onClosed={() => this.setState({ modalVisible: false })} />
+                    onClosed={() => this.setModalVisible(false)} />
+                <TextInputModal 
+                    title="Add new Tag"
+                    message="Help us improve by adding a new meanningfull tag"
+                    placeholder="New Tag"
+                    response={this.props.tagAddedResponse}
+                    onPossitive={(text) => {this.props.addTag(eid, null, text)}}
+                    onNegative={() => {console.log("Negative pressed")}}
+                    visible={this.state.textInputModalVisible} 
+                    onClosed={() => this.setTextInputModalVisible(false)}/>
             </View>
 
         )
@@ -492,11 +507,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ data }) => {
 
-    const { selectedEpisode, fade } = data;
+    const { selectedEpisode, fade, tagAddedResponse } = data;
 
     return {
-        selectedEpisode, fade
+        selectedEpisode, fade, tagAddedResponse
     };
 };
 
-export default connect(mapStateToProps, { clearNewContentValues, commendTag })(Episode)
+export default connect(mapStateToProps, { clearNewContentValues, commendTag, addTag })(Episode)

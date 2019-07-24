@@ -12,6 +12,7 @@ export const CLEAR_NEW_CONTENT_VALUES = "clear_new_content_values"
 export const CHANGE_RESPONSE_COLOR = "change_response_color"
 export const EPISODE_TAG_REPORTED = "episode_tag_reported"
 export const EPISODE_TAG_COMMENDED = "episode_tag_commended"
+export const EPISODE_TAG_ADDED = "episode_tag_added"
 // export const RESET_MOVIE_DETAIL_STATE = 'reset_movie_detail_state';
 // export const GET_MOVIE_MEDIA_SIZE = "get_movie_media_size";
 // export const ARTIST_CHANGED = 'artist_changed';

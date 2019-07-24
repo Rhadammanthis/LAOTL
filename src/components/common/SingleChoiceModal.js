@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import React, { Component } from 'react'
 import Modal from 'react-native-modalbox';
-import { COLORS, CONTENT_TYPE } from '../common/Constants'
+import { COLORS, CONTENT_TYPE } from './Constants'
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -65,7 +65,7 @@ class SingleChoiceModal extends Component {
         const { visible, onClosed, children, onPossitive, onNegative, message, ...rest } = this.props;
 
         return (
-            <Modal style={{ height: 150, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
+            <Modal useNativeDriver={false} style={{ height: 150, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
                 isOpen={this.state.visible} onClosed={this.onClosed}
                 position={"bottom"} {...rest}>
                 <View style={{ alignItems: "center", flex: 1, backgroundColor: "#282828" }}>
@@ -75,6 +75,18 @@ class SingleChoiceModal extends Component {
                         <View onLayout={(event) => {
                             this.setState({ width: event.nativeEvent.layout.width / 2 })
                         }} style={{ flexDirection: "row", width: 150, justifyContent: "space-around" }}>
+                            <AnimatedTouchableOpacity onLayout={(event) => { this.setState({ x1: event.nativeEvent.layout.x }); console.log("View2", event.nativeEvent.layout.x) }}
+                                style={[styles.button, {
+                                    borderColor: COLORS.RED,
+                                    opacity: this._animatedView2, transform: [{
+                                        translateX: this._animTranlation.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [0, this.state.width - (this.state.x1 + 25)]  // 0 : 150, 0.5 : 75, 1 : 0
+                                        }),
+                                    }],
+                                }]} onPress={() => this.onPressed(2, onNegative)}>
+                                <Image style={[styles.image, { tintColor: COLORS.RED }]} source={require('../../images/cross.png')} />
+                            </AnimatedTouchableOpacity>
                             <AnimatedTouchableOpacity onLayout={(event) => { this.setState({ x: event.nativeEvent.layout.x }); console.log("View1", event.nativeEvent.layout.x) }}
                                 style={[styles.button, {
                                     opacity: this._animatedView1, transform: [{
@@ -85,17 +97,6 @@ class SingleChoiceModal extends Component {
                                     }],
                                 }]} onPress={() => this.onPressed(1, onPossitive)}>
                                 <Image style={styles.image} source={require('../../images/check.png')} />
-                            </AnimatedTouchableOpacity>
-                            <AnimatedTouchableOpacity onLayout={(event) => { this.setState({ x1: event.nativeEvent.layout.x }); console.log("View2", event.nativeEvent.layout.x) }}
-                                style={[styles.button, { borderColor: COLORS.RED, 
-                                    opacity: this._animatedView2, transform: [{
-                                        translateX: this._animTranlation.interpolate({
-                                            inputRange: [0, 1],
-                                            outputRange: [0, this.state.width - (this.state.x1 + 25)]  // 0 : 150, 0.5 : 75, 1 : 0
-                                        }),
-                                    }],
-                                }]} onPress={() => this.onPressed(2, onNegative)}>
-                                <Image style={[styles.image, {tintColor: COLORS.RED }]} source={require('../../images/cross.png')} />
                             </AnimatedTouchableOpacity>
                         </View>
                     </View>
@@ -124,11 +125,11 @@ const styles = StyleSheet.create({
     },
     button: {
         height: 50,
-        width: 50, 
-        borderRadius: 25, 
-        borderColor: COLORS.GREEN, 
-        borderWidth: 2, 
-        alignItems: "center", 
+        width: 50,
+        borderRadius: 25,
+        borderColor: COLORS.GREEN,
+        borderWidth: 2,
+        alignItems: "center",
         justifyContent: "center",
     }
 
