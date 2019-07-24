@@ -3,15 +3,20 @@ import {
     StyleSheet, Text, View,
     Image, TouchableNativeFeedback,
     SectionList, Animated, Platform,
-    Dimensions, StatusBar, LayoutAnimation, Easing
+    Dimensions, StatusBar, LayoutAnimation, Easing,
+    Linking, TouchableOpacity, ScrollView, Button,
+    TextInput
 } from 'react-native';
+// import Modal from 'react-native-modal';
+import SingleChoiceModal from '../components/common/SingleChoiceModal';
+import TextInputModal from '../components/common/TextInputModal';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Transparency from './common/Transparency'
 import { COLORS, CONTENT_TYPE } from './common/Constants'
 import { connect } from 'react-redux'
 import { ArticleListItem, BookListItem, MovieListItem, VideoListItem } from './pure'
-import { clearNewContentValues } from '../actions'
+import { clearNewContentValues, commendTag, addTag } from '../actions'
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList);
 const win = Dimensions.get('window');
@@ -25,7 +30,10 @@ class Episode extends Component {
         isActionButtonVisible: false,
         fadeAnim: new Animated.Value(0),
         fadeBackground: new Animated.Value(0),
-        scrollEnabled: false
+        scrollEnabled: false,
+        modalVisible: false,
+        textInputModalVisible: false,
+        selectedTagId: null
     }
 
     sectionsData = []
@@ -35,13 +43,16 @@ class Episode extends Component {
 
     componentWillMount() {
 
+        // console.log("Screen height", win.height)
+
         episode = this.props.selectedEpisode;
+        eid = "-LgyE_4sNP4WMb2rufDL"
 
         for (var category in episode.notes) {
-            console.log("Category", category)
+            // console.log("Category", category)
             var sectionContent = []
             for (var item in episode.notes[category]) {
-                console.log("Item", item);
+                // console.log("Item", item);
                 var mappedItem = episode.notes[category][item]
                 mappedItem.nid = item
                 sectionContent.push(mappedItem)
@@ -56,20 +67,13 @@ class Episode extends Component {
 
     renderListHeader = (imageTranslate) => {
 
-        millisToReadable = (millis) => {
-            sec = millis / 1000
-            hour = Math.floor(sec / 3600);
-            min = Math.floor(((sec - (hour * 3600)) / 60))
-            sec = sec - (hour * 3600) - (min * 60)
-
-            return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
-        }
-
         return (
             <View style={{ flex: 1 }}>
 
                 <View style={{ width: win.width, height: (win.height - StatusBar.currentHeight), overflow: "hidden", zIndex: 1, flex: 1 }}>
                     <Animated.Image style={{
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
                         borderBottomLeftRadius: 20,
                         borderBottomRightRadius: 20,
                         alignSelf: 'stretch',
@@ -78,16 +82,16 @@ class Episode extends Component {
                         transform: [{ scale: imageTranslate }]
                     }}
 
-                        source={{ uri: this.props.selectedEpisode.cover_image }}
+                        source={{ uri: episode.cover_image }}
                     >
                     </Animated.Image>
                 </View>
 
                 {this.state.titleViewHeight > 0
-                ? <Animated.View style={{ zIndex: 2, marginTop: -(this.state.titleViewHeight), opacity: this.state.fadeBackground }}>
-                    <Transparency size={this.state.titleViewHeight} />
-                </Animated.View>
-                : null}
+                    ? <Animated.View style={{ zIndex: 2, marginTop: -(this.state.titleViewHeight), opacity: this.state.fadeBackground }}>
+                        <Transparency size={this.state.titleViewHeight} />
+                    </Animated.View>
+                    : null}
 
                 <Animated.View onLayout={(event) => { if (this.state.titleViewHeight > 0) return; this.setState({ titleViewHeight: event.nativeEvent.layout.height }); console.log("Hight recorded") }} style={{
                     marginTop: 0,
@@ -97,32 +101,23 @@ class Episode extends Component {
                             outputRange: [0, -this.state.titleViewHeight]  // 0 : 150, 0.5 : 75, 1 : 0
                         }),
                     }],
-                    paddingBottom: 50, zIndex: 2
+                    paddingBottom: 50,
+                    zIndex: 2,
+                    marginBottom: - this.state.titleViewHeight
                 }}>
                     <Animated.Text style={[styles.title, { marginHorizontal: 40, marginVertical: 30, textAlign: 'center' }]}>
-                        {this.props.selectedEpisode.title}
+                        {episode.title}
                     </Animated.Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
-                                {millisToReadable(this.props.selectedEpisode.duration)}
-                            </Text>
-                        </View>
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                            <Image style={styles.icon} source={require('../images/clock.png')} />
-                            <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10 }}>
-                                {millisToReadable(this.props.selectedEpisode.duration)}
-                            </Text>
-                        </View>
-                    </View>
-                </Animated.View>              
-
-                <Text style={[styles.description, {marginTop: - this.state.titleViewHeight}]}>
-                    {this.props.selectedEpisode.description}
+                    {this._renderAtts()}
+                </Animated.View>
+                {this._renderSeriesEpisodes()}
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginHorizontal: 10 }}>Description</Text>
+                <Text style={[styles.description]}>
+                    {episode.description}
                 </Text>
+                {this._renderTags()}
                 <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: COLORS.BRIGHT_ORANGE, marginVertical: 10 }} />
-                <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25 }]}>
+                <Text style={[styles.title, { fontWeight: 'normal', marginBottom: 10, fontSize: 25, marginHorizontal: 10 }]}>
                     Show Notes
                 </Text>
             </View>
@@ -178,12 +173,17 @@ class Episode extends Component {
 
                 const currentOffset = event.nativeEvent.contentOffset.y
                 this.setState({ scrollPosY: currentOffset })
-                console.log("In scroll method", currentOffset)
+                // console.log("In scroll method", currentOffset)
                 const direction = (currentOffset > 0 && currentOffset > this._listViewOffset)
                     ? 'down'
                     : 'up'
 
-                const isActionButtonVisible = direction === 'down'
+                const paddingToBottom = 20;
+
+                const reachedBottom = (event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y >=
+                    event.nativeEvent.contentSize.height - paddingToBottom)
+
+                const isActionButtonVisible = direction === 'down' || reachedBottom
                 if (isActionButtonVisible !== this.state.isActionButtonVisible) {
                     LayoutAnimation.configureNext(CustomLayoutLinear)
                     this.setState({ isActionButtonVisible })
@@ -196,25 +196,136 @@ class Episode extends Component {
 
     componentDidUpdate(prevProps) {
         // Typical usage (don't forget to compare props):
-        console.log("Updated")
-        var interval = setTimeout(() => {
+        if (this.state.titleViewHeight > 0)
+            var interval = setTimeout(() => {
+                Animated.parallel([
+                    Animated.timing(this.state.fadeAnim, {
+                        toValue: 1,
+                        easing: Easing.out(Easing.back()),
+                        duration: 700,
+                        useNativeDriver: true
+                    }),
+                    Animated.timing(this.state.fadeBackground, {
+                        toValue: 1,
+                        duration: 500,
+                        useNativeDriver: true
+                    }),
+                ]).start((result) => {
+                    if (this.state.scrollEnabled == false)
+                        this.setState({ scrollEnabled: true })
+                    clearTimeout(interval)
+                });
+            }, 500)
+    }
 
-            Animated.parallel([
-                Animated.timing(this.state.fadeAnim, {
-                    toValue: 1,
-                    easing: Easing.out(Easing.back()),
-                    duration: 700,
-                }),
-                Animated.timing(this.state.fadeBackground, {
-                    toValue: 1,
-                    duration: 500,
-                }),
-              ]).start((result) => { 
-                if(this.state.scrollEnabled == false)
-                    this.setState({scrollEnabled: true})
-                clearTimeout(interval) 
-            });
-        }, 500)
+    _renderAtts() {
+
+        millisToReadable = (millis) => {
+            sec = millis / 1000
+            hour = Math.floor(sec / 3600);
+            min = Math.floor(((sec - (hour * 3600)) / 60))
+            sec = sec - (hour * 3600) - (min * 60)
+
+            return hour + ":" + (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec)
+        }
+
+        return (
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Image style={styles.icon} source={require('../images/hot.png')} />
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        {episode.category}
+                    </Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <Image style={styles.icon} source={require('../images/clock.png')} />
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        {millisToReadable(episode.duration)}
+                    </Text>
+                </View>
+                {episode.gold_star
+                    ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                            Gold Star
+                </Text>
+                    </View>
+                    : null}
+            </View>
+        )
+    }
+
+    _renderSeriesEpisodes() {
+        if (episode.part_of_series == null || episode.series_episodes == null)
+            return null
+
+        var currentEpisode = episode.series_episodes.indexOf(eid)
+        var mappedItems = episode.series_episodes.map((episode, i) => {
+
+            var romanNumber = ""
+            for (let index = 0; index < i + 1; index++) {
+                romanNumber += "I"
+            }
+
+            return i == currentEpisode
+                ? <View key={i} style={{ flex: 1, alignItems: "center" }}>
+                    <Text style={{ color: "white", textAlign: 'center', fontSize: 22, borderRadius: 40, backgroundColor: COLORS.MUTE_ORANGE, width: 40, height: 40, padding: 5 }}>{romanNumber}</Text>
+                </View>
+                : <View key={i} style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, fontSize: 22 }}>{romanNumber}</Text>
+                </View>
+        })
+
+        return (
+            <View style={{ flexDirection: "row", flex: 1, marginVertical: 5 }}>
+                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE }}> EP.</Text>
+                </View>
+                <View style={{ flexDirection: "row", flex: 9, justifyContent: 'space-between' }}>
+                    {mappedItems}
+                </View>
+            </View>
+        )
+    }
+
+    _renderTags() {
+
+        var topRated = []
+        var tags = Object.keys(episode.tags)
+
+        tags.forEach((tag,i) => {
+
+            // console.log("Tag", tag)
+
+            topRated.push(
+                <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
+                    <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
+                        <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
+                    </View>
+                </TouchableOpacity>
+            )
+
+        }) 
+
+        return (
+            <View style={{ marginVertical: 5, marginHorizontal: 5 }}>
+                <Text style={{ color: COLORS.MUTE_ORANGE, marginBottom: 5, marginLeft: 5 }}>Tags</Text>
+                <ScrollView horizontal={true} overScrollMode="never" showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: "row", justifyContent: 'flex-start' }}>
+                    {topRated}
+                    <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: 5 }}>
+                        <TouchableOpacity onPress={() => { this.setTextInputModalVisible(true) }} style={{
+                            width: 25, height: 25, backgroundColor: COLORS.MUTE_ORANGE,
+                            borderRadius: 12.5, alignItems: "center", justifyContent: "center"
+                        }}>
+                            <Image style={{
+                                height: 15,
+                                width: 15, tintColor: "white"
+                            }} source={require('../images/add_white.png')} />
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
+        )
     }
 
     _renderNavigationBar(headerFade) {
@@ -223,18 +334,33 @@ class Episode extends Component {
             // fully visible nav bar when updatin the state 
             <Animated.View style={[styles.navBar, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]}>
                 <Animated.Text style={[styles.navBarTitle, { opacity: this.state.scrollPosY > 0 ? headerFade : 0 }]} numberOfLines={1}>
-                    {this.props.selectedEpisode.number} - {this.props.selectedEpisode.title}
+                    {episode.number} - {episode.title}
                 </Animated.Text>
             </Animated.View>)
     }
 
     _renderNavArrow() {
         return (
-            <TouchableNativeFeedback style={styles.backButton}
-                onPress={() => { this.props.navigation.goBack() }}>
-                <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
-            </TouchableNativeFeedback>
+            <View style={{ flexDirection: "row", flex: 1, width: win.width, position: "absolute", top: 0, height: 50, alignItems: "center" }}>
+                <TouchableOpacity
+                    onPress={() => { this.props.navigation.goBack() }}>
+                    <Image style={styles.backButtonImage} source={require('../images/arrow_back.png')} />
+                </TouchableOpacity>
+                <View style={{ flex: 1 }} />
+                <TouchableOpacity
+                    onPress={() => { Linking.openURL(episode.audio_url) }}>
+                    <Image style={styles.backButtonImage} source={require('../images/speaker.png')} />
+                </TouchableOpacity>
+            </View>
         )
+    }
+
+    setModalVisible(visible) {
+        this.setState({ modalVisible: visible });
+    }
+
+    setTextInputModalVisible(visible) {
+        this.setState({ textInputModalVisible: visible });
     }
 
     _renderActionButton() {
@@ -263,13 +389,13 @@ class Episode extends Component {
     render() {
 
         headerFade = this.state.scrollY.interpolate({
-            inputRange: [0, 275, 354, 355],
+            inputRange: [0, win.height * 0.55, (win.height * 0.55) + 79, (win.height * 0.55) + 80],
             outputRange: [0, 0.01, 0.9, 1],
             extrapolate: 'clamp'
         });
 
         imageTranslate = this.state.scrollY.interpolate({
-            inputRange: [100, 370],
+            inputRange: [60, 370],
             outputRange: [1, 1.35],
             extrapolate: 'clamp',
         });
@@ -289,6 +415,21 @@ class Episode extends Component {
                 {this._renderNavigationBar(headerFade)}
                 {this._renderNavArrow()}
                 {this._renderActionButton()}
+                <SingleChoiceModal
+                    message="Is this tag helpffull? Help us improve!"
+                    onPossitive={() => {this.props.commendTag(null, null, this.state.selectedTagId, episode.part_of_series)}} 
+                    onNegative={() => {console.log("Negative pressed")}}
+                    visible={this.state.modalVisible} 
+                    onClosed={() => this.setModalVisible(false)} />
+                <TextInputModal 
+                    title="Add new Tag"
+                    message="Help us improve by adding a new meanningfull tag"
+                    placeholder="New Tag"
+                    response={this.props.tagAddedResponse}
+                    onPossitive={(text) => {this.props.addTag(eid, null, text)}}
+                    onNegative={() => {console.log("Negative pressed")}}
+                    visible={this.state.textInputModalVisible} 
+                    onClosed={() => this.setTextInputModalVisible(false)}/>
             </View>
 
         )
@@ -313,7 +454,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: COLORS.MUTE_ORANGE,
         fontWeight: 'bold',
-        marginLeft: 35
+        marginLeft: 35,
+        marginRight: 35
     },
     addContent: {
         position: 'absolute',
@@ -339,12 +481,7 @@ const styles = StyleSheet.create({
         height: 25,
         width: 25,
         tintColor: COLORS.BRIGHT_ORANGE,
-        marginLeft: 5,
-        position: 'absolute',
-        top: 13,
-        bottom: 0,
-        left: 0,
-        right: 0,
+        marginHorizontal: 5,
     },
     description: {
         flex: 2,
@@ -352,7 +489,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     icon: {
-        marginTop: -5,
         height: 25,
         width: 25,
         tintColor: COLORS.BRIGHT_ORANGE,
@@ -371,11 +507,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ data }) => {
 
-    const { selectedEpisode, fade } = data;
+    const { selectedEpisode, fade, tagAddedResponse } = data;
 
     return {
-        selectedEpisode, fade
+        selectedEpisode, fade, tagAddedResponse
     };
 };
 
-export default connect(mapStateToProps, { clearNewContentValues })(Episode)
+export default connect(mapStateToProps, { clearNewContentValues, commendTag, addTag })(Episode)

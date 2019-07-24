@@ -5,7 +5,8 @@ export const COLORS = {
     TOOLBAR: "#211f19",
     GREEN: "#1DB954",
     RED: "#FF0000",
-    YELLOW: "#FFA500"
+    YELLOW: "#FFA500",
+    GOLD: "#DAA520"
 }
 
 export const CONTENT_TYPE = {

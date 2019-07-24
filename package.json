@@ -16,6 +16,7 @@
     "react-native": "0.49.3",
     "react-native-action-button": "^2.8.4",
     "react-native-flip-card": "^3.5.2",
+    "react-native-modalbox": "^1.6.0",
     "react-native-progress": "^3.5.0",
     "react-navigation": "^1.0.0-beta.15",
     "react-redux": "^5.0.6",
