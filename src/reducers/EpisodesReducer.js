@@ -544,6 +544,10 @@ export default (state = INITIAL_STATE, action) => {
 			return { ...state, tagCommendedRes: action.payload }
 		case EPISODE_TAG_ADDED:
 			var selectedEpisode = state.selectedEpisode;
+			
+			if(!selectedEpisode.hasOwnProperty("tags"))
+				selectedEpisode.tags = {}
+
 			selectedEpisode.tags[action.payload.data.firebaseKey] = action.payload.data.data
 			return { ...state, tagAddedResponse: action.payload, selectedEpisode: selectedEpisode }
 		default:

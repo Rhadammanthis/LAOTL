@@ -5,10 +5,11 @@ import {
     EPISODE_TAG_ADDED
 } from './types'
 import axios from 'axios'
+import { LayoutAnimation } from 'react-native';
 
 export const selectEpisode = (episode, firebaseId, navigate) => {
     console.log(episode.title)
-    navigate('Episode', {title: episode.title, number: episode.number, firebaseId: firebaseId})
+    navigate('Episode', { title: episode.title, number: episode.number, firebaseId: firebaseId })
     return {
         type: SELECTED_EPISODE,
         payload: episode
@@ -49,7 +50,7 @@ export const addTag = (eid, uid, title, sid) => {
         data: {
             created_on: new Date().getTime(),
             creator_id: "-LgDElEfPYMILyZZkAb1",
-            title: title,           
+            title: title,
         }
     }
 
@@ -59,6 +60,19 @@ export const addTag = (eid, uid, title, sid) => {
         axios.post('http://192.168.0.102:8080/laotl/addLabel', body)
             .then((response) => {
                 console.log(response);
+
+                LayoutAnimation.configureNext({
+                    duration: 200,
+                    create: {
+                      type: LayoutAnimation.Types.linear,
+                      property: LayoutAnimation.Properties.scaleXY,
+                    },
+                    update: {
+                        type: LayoutAnimation.Types.linear,
+                        property: LayoutAnimation.Properties.scaleXY,
+                      },
+                  })
+
                 dispatch({ type: EPISODE_TAG_ADDED, payload: response });
             })
             .catch((error) => {

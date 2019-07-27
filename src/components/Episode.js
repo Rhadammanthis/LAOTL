@@ -46,7 +46,7 @@ class Episode extends Component {
         // console.log("Screen height", win.height)
 
         episode = this.props.selectedEpisode;
-        eid = "-LgyE_4sNP4WMb2rufDL"
+        firebaseId = this.props.navigation.state.params.firebaseId
 
         for (var category in episode.notes) {
             // console.log("Category", category)
@@ -259,7 +259,7 @@ class Episode extends Component {
         if (episode.part_of_series == null || episode.series_episodes == null)
             return null
 
-        var currentEpisode = episode.series_episodes.indexOf(eid)
+        var currentEpisode = episode.series_episodes.indexOf(firebaseId)
         var mappedItems = episode.series_episodes.map((episode, i) => {
 
             var romanNumber = ""
@@ -291,21 +291,20 @@ class Episode extends Component {
     _renderTags() {
 
         var topRated = []
-        var tags = Object.keys(episode.tags)
 
-        tags.forEach((tag,i) => {
+        if (episode.tags != null) {
+            var tags = Object.keys(episode.tags)
+            tags.forEach((tag, i) => {
+                topRated.push(
+                    <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
+                        <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
+                            <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )
 
-            // console.log("Tag", tag)
-
-            topRated.push(
-                <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
-                    <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
-                        <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-
-        }) 
+            })
+        }
 
         return (
             <View style={{ marginVertical: 5, marginHorizontal: 5 }}>
@@ -417,19 +416,19 @@ class Episode extends Component {
                 {this._renderActionButton()}
                 <SingleChoiceModal
                     message="Is this tag helpffull? Help us improve!"
-                    onPossitive={() => {this.props.commendTag(null, null, this.state.selectedTagId, episode.part_of_series)}} 
-                    onNegative={() => {console.log("Negative pressed")}}
-                    visible={this.state.modalVisible} 
+                    onPossitive={() => { this.props.commendTag(firebaseId, null, this.state.selectedTagId, episode.part_of_series) }}
+                    onNegative={() => { console.log("Negative pressed") }}
+                    visible={this.state.modalVisible}
                     onClosed={() => this.setModalVisible(false)} />
-                <TextInputModal 
+                <TextInputModal
                     title="Add new Tag"
                     message="Help us improve by adding a new meanningfull tag"
                     placeholder="New Tag"
                     response={this.props.tagAddedResponse}
-                    onPossitive={(text) => {this.props.addTag(eid, null, text)}}
-                    onNegative={() => {console.log("Negative pressed")}}
-                    visible={this.state.textInputModalVisible} 
-                    onClosed={() => this.setTextInputModalVisible(false)}/>
+                    onPossitive={(text) => { this.props.addTag(firebaseId, null, text, episode.part_of_series) }}
+                    onNegative={() => { console.log("Negative pressed") }}
+                    visible={this.state.textInputModalVisible}
+                    onClosed={() => this.setTextInputModalVisible(false)} />
             </View>
 
         )
