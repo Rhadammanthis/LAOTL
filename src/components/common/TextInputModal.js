@@ -16,7 +16,7 @@ class TextInputModal extends Component {
         this.state = {
             visible: props.visible,
             isFocused: false,
-            text: "LOL",
+            text: "",
             success: false,
             errorVisible: false,
         };

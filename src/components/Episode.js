@@ -46,7 +46,9 @@ class Episode extends Component {
         // console.log("Screen height", win.height)
 
         episode = this.props.selectedEpisode;
-        eid = "-LgyE_4sNP4WMb2rufDL"
+        firebaseId = this.props.navigation != undefined 
+            ? "-LgyG1SzZpAmCrdfaJ4y" 
+            : this.props.navigation.state.params.firebaseId
 
         for (var category in episode.notes) {
             // console.log("Category", category)
@@ -215,7 +217,7 @@ class Episode extends Component {
                         this.setState({ scrollEnabled: true })
                     clearTimeout(interval)
                 });
-            }, 500)
+            }, 50)
     }
 
     _renderAtts() {
@@ -233,24 +235,33 @@ class Episode extends Component {
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/hot.png')} />
-                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                         {episode.category}
                     </Text>
                 </View>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/clock.png')} />
-                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                         {millisToReadable(episode.duration)}
                     </Text>
                 </View>
                 {episode.gold_star
-                    ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    ? 
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                         <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
-                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                             Gold Star
-                </Text>
+                        </Text>
                     </View>
                     : null}
+                <TouchableOpacity style={{flex: 1}}>
+                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                        <Image style={styles.icon} source={require('../images/heart_border.png')} />
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
+                            Add to Favorites
+                        </Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -259,7 +270,7 @@ class Episode extends Component {
         if (episode.part_of_series == null || episode.series_episodes == null)
             return null
 
-        var currentEpisode = episode.series_episodes.indexOf(eid)
+        var currentEpisode = episode.series_episodes.indexOf(firebaseId)
         var mappedItems = episode.series_episodes.map((episode, i) => {
 
             var romanNumber = ""
@@ -291,21 +302,20 @@ class Episode extends Component {
     _renderTags() {
 
         var topRated = []
-        var tags = Object.keys(episode.tags)
 
-        tags.forEach((tag,i) => {
+        if (episode.tags != null) {
+            var tags = Object.keys(episode.tags)
+            tags.forEach((tag, i) => {
+                topRated.push(
+                    <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
+                        <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
+                            <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )
 
-            // console.log("Tag", tag)
-
-            topRated.push(
-                <TouchableOpacity key={tag} onLongPress={() => { this.setState({ selectedTagId: tags[i] }); this.setModalVisible(true) }}>
-                    <View style={{ backgroundColor: COLORS.MUTE_ORANGE, borderRadius: 15, padding: 5, marginHorizontal: 5 }}>
-                        <Text style={{ color: "white" }}> {episode.tags[tag].title}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-
-        }) 
+            })
+        }
 
         return (
             <View style={{ marginVertical: 5, marginHorizontal: 5 }}>
@@ -417,19 +427,19 @@ class Episode extends Component {
                 {this._renderActionButton()}
                 <SingleChoiceModal
                     message="Is this tag helpffull? Help us improve!"
-                    onPossitive={() => {this.props.commendTag(null, null, this.state.selectedTagId, episode.part_of_series)}} 
-                    onNegative={() => {console.log("Negative pressed")}}
-                    visible={this.state.modalVisible} 
+                    onPossitive={() => { this.props.commendTag(firebaseId, null, this.state.selectedTagId, episode.part_of_series) }}
+                    onNegative={() => { console.log("Negative pressed") }}
+                    visible={this.state.modalVisible}
                     onClosed={() => this.setModalVisible(false)} />
-                <TextInputModal 
+                <TextInputModal
                     title="Add new Tag"
                     message="Help us improve by adding a new meanningfull tag"
                     placeholder="New Tag"
                     response={this.props.tagAddedResponse}
-                    onPossitive={(text) => {this.props.addTag(eid, null, text)}}
-                    onNegative={() => {console.log("Negative pressed")}}
-                    visible={this.state.textInputModalVisible} 
-                    onClosed={() => this.setTextInputModalVisible(false)}/>
+                    onPossitive={(text) => { this.props.addTag(firebaseId, null, text, episode.part_of_series) }}
+                    onNegative={() => { console.log("Negative pressed") }}
+                    visible={this.state.textInputModalVisible}
+                    onClosed={() => this.setTextInputModalVisible(false)} />
             </View>
 
         )
