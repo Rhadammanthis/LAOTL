@@ -22,12 +22,12 @@ export const doSerach = (episodes, textToSearch) => {
         Object.keys(episodes).slice(0, 10).map((x) => {
 
             console.log("Episode", episodes[x])
-            console.log("Labels", episodes[x].labels)
+            console.log("Tags", episodes[x].tags)
 
-            if (episodes[x].labels !== undefined) {
-                Object.keys(episodes[x].labels).map((key) => {
+            if (episodes[x].tags !== undefined) {
+                Object.keys(episodes[x].tags).map((key) => {
 
-                    var labelTitle = episodes[x].labels[key].name
+                    var labelTitle = episodes[x].tags[key].title
 
                     if (levenshtein(labelTitle, normalizedTextToSearch) <= 1)
                         matches.push(episodes[x])
@@ -52,7 +52,7 @@ export const doSerach = (episodes, textToSearch) => {
                     }
                 });
                 // console.log('Actions...', Object.keys(episodes).slice(0, 10))
-                // console.log(`Search: ${textToSearch.toLowerCase()}, Label: ${episodes[x].labels}, Levebshtein: ${levenshtein(episodes[x].labels, textToSearch.toLowerCase())}`)
+                // console.log(`Search: ${textToSearch.toLowerCase()}, Label: ${episodes[x].tags}, Levebshtein: ${levenshtein(episodes[x].tags, textToSearch.toLowerCase())}`)
             }
         })
 
@@ -64,8 +64,8 @@ export const doSerach = (episodes, textToSearch) => {
 }
 
 var levenshtein = function (a, b) {
-    if (a.length == 0) return b.length;
-    if (b.length == 0) return a.length;
+    if (a == undefined || a.length == 0) return b.length;
+    if (b == undefined || b.length == 0) return a.length;
 
     // swap to save some memory O(min(a,b)) instead of O(a)
     if (a.length > b.length) {
