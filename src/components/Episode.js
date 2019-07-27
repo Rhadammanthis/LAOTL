@@ -46,7 +46,9 @@ class Episode extends Component {
         // console.log("Screen height", win.height)
 
         episode = this.props.selectedEpisode;
-        firebaseId = this.props.navigation.state.params.firebaseId
+        firebaseId = this.props.navigation != undefined 
+            ? "-LgyG1SzZpAmCrdfaJ4y" 
+            : this.props.navigation.state.params.firebaseId
 
         for (var category in episode.notes) {
             // console.log("Category", category)
@@ -215,7 +217,7 @@ class Episode extends Component {
                         this.setState({ scrollEnabled: true })
                     clearTimeout(interval)
                 });
-            }, 500)
+            }, 50)
     }
 
     _renderAtts() {
@@ -233,24 +235,33 @@ class Episode extends Component {
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/hot.png')} />
-                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                         {episode.category}
                     </Text>
                 </View>
                 <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                     <Image style={styles.icon} source={require('../images/clock.png')} />
-                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                    <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                         {millisToReadable(episode.duration)}
                     </Text>
                 </View>
                 {episode.gold_star
-                    ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    ? 
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                         <Image style={[styles.icon, { tintColor: COLORS.GOLD }]} source={require('../images/star.png')} />
-                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15 }}>
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
                             Gold Star
-                </Text>
+                        </Text>
                     </View>
                     : null}
+                <TouchableOpacity style={{flex: 1}}>
+                    <View style={{ justifyContent: "center", alignItems: "center" }}>
+                        <Image style={styles.icon} source={require('../images/heart_border.png')} />
+                        <Text style={{ color: COLORS.MUTE_ORANGE, marginHorizontal: 10, fontSize: 15, textAlign: 'center' }}>
+                            Add to Favorites
+                        </Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         )
     }
