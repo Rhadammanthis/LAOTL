@@ -50,10 +50,6 @@ export default class Form extends Component {
                 icon={field.icon}
             />;
         });
-    };
-
-    componentWillMount() {
-
 
     }
 
@@ -83,8 +79,10 @@ export default class Form extends Component {
 
     render() {
 
+        const { style, buttonText } = this.props
+
         return (
-            <View>
+            <View style={style}>
                 {textFields}
                 <View style={{ flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}></View>
@@ -95,7 +93,7 @@ export default class Form extends Component {
                             alignItems: 'center', borderRadius: 5
                         }}
                     >
-                        <Text style={{ color: 'white', fontSize: 15 }}>Add Content</Text>
+                        <Text style={{ color: 'white', fontSize: 15 }}>{buttonText}</Text>
                     </TouchableOpacity >
                     <View style={{ flex: 1 }}></View>
                 </View>

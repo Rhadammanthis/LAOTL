@@ -5,6 +5,7 @@ import Archive from './components/Archive';
 import Search from './components/Search';
 import Episode from './components/Episode'
 import AddNew from './components/AddNew'
+import SignUp from './components/SignUp'
 
 var mainFlow = TabNavigator(
 	{
@@ -62,6 +63,12 @@ export default StackNavigator(
 			navigationOptions: {
 				header: () => null
 			}
+		},
+		SignUp: {
+			screen: SignUp,
+			navigationOptions: ({ navigation }) => ({
+				header: null
+			})
 		},
 		MainFlow: {
 			screen: mainFlow,
