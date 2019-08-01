@@ -1,4 +1,6 @@
+import React from 'react';
 import { StackNavigator, TabNavigator } from 'react-navigation';
+import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
 import Archive from './components/Archive';
@@ -6,6 +8,8 @@ import Search from './components/Search';
 import Episode from './components/Episode'
 import AddNew from './components/AddNew'
 import SignUp from './components/SignUp'
+import Profile from './components/Profile'
+import Buffer from './components/SignUp'
 
 var mainFlow = TabNavigator(
 	{
@@ -64,16 +68,28 @@ export default StackNavigator(
 				header: () => null
 			}
 		},
-		SignUp: {
-			screen: SignUp,
+		MainFlow: {
+			screen: mainFlow,
+			navigationOptions: ({ navigation }) => {
+				let selected = navigation.state.params && navigation.state.params.selectionState;
+				console.log("Selected",navigation)
+				// console.log("Slection",navigation.state.params.selectionState)
+				return ({
+					title: 'Last App On The Left',
+					headerRight: <Icon onPress={() => { navigation.navigate("Buffer")}} name={"md-contact"} style={{ color: 'grey', fontSize: 30, marginHorizontal: 10 }} />
+				})
+			}
+		},
+		Buffer: {
+			screen: Buffer,
 			navigationOptions: ({ navigation }) => ({
 				header: null
 			})
 		},
-		MainFlow: {
-			screen: mainFlow,
+		Profile: {
+			screen: Profile,
 			navigationOptions: ({ navigation }) => ({
-				title: 'Last App On The Left',
+				header: null
 			})
 		},
 		Episode: {

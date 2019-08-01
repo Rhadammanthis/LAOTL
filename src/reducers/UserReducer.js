@@ -1,11 +1,12 @@
 import {
 	SIGN_UP_USER,
-	USER_LOGED_IN
+	USER_LOGED_IN,
+	SET_USER
 } from '../actions/types';
 
 const INITIAL_STATE = { 
 	userCreatedResponse : null,
-	user:null
+	loggedInUser:null
  };
 
 export default (state = INITIAL_STATE, action) => {
@@ -13,7 +14,9 @@ export default (state = INITIAL_STATE, action) => {
 		case SIGN_UP_USER:
 			return {...state, userCreatedResponse: action.payload}
 		case USER_LOGED_IN:
-			return {...state, user: action.payload}
+			return {...state, loggedInUser: action.payload}
+		case SET_USER:
+			return {...state, loggedInUser: action.payload}
 		default:
 			return state;
 	}

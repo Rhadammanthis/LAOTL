@@ -170,3 +170,20 @@ const mapStateToProps = ({ user }) => {
 };
 
 export default connect(mapStateToProps, { createUser, login })(SignUp)
+
+ export class Buffer extends Component {
+
+    state = {
+        userLoggedIn: false
+    }
+
+    render() {
+
+        if(this.state.userLoggedIn )
+        return (
+            <Profile/>
+        )
+        else
+            return(<SignUp/>)
+    }
+}

@@ -49,6 +49,7 @@ export const setLoggedUser = () => {
     return(dispatch) => {
 
         firebase.auth().onAuthStateChanged((user) => {
+            console.log("Got user", user)
             if (user) {
                 dispatch({type: SET_USER, payload: user})
             } else {

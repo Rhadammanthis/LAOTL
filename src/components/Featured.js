@@ -5,20 +5,33 @@ import {
     TouchableOpacity, Image
 } from 'react-native';
 import { connect } from 'react-redux';
-import { selectEpisode } from '../actions'
+import { selectEpisode, setLoggedUser } from '../actions'
 
 class Featured extends Component {
 
     componentWillMount() {
 
         console.log('From firebase', this.props.episodes)
+        this.props.setLoggedUser();
+        // console.log("Parent", this.props.navigation.dangerouslyGetParent())
 
     }
 
     onEpisodeSelected(){
-        console.log('Clicked!')
+        // console.log('Clicked!')
         this.props.selectEpisode(this.props.episode, this.props.navigate)
     }
+
+    // componentWillReceiveProps(nextProps){
+    //     console.log("Did update")
+    //     // this.props.navigation.setParams({ selectionState: "SignUp" });
+    //     if(this.props.loggedInUser != nextProps.loggedInUser)
+    //         this.props.navigation.setParams({ selectionState: "Profile" });
+    //     // else
+    //     //     this.props.navigation.setParams({ selectionState: "SignUp" });
+
+    //     console.log("User", this.props.loggedInUser)
+    // }
 
     render() {
 
@@ -120,13 +133,14 @@ const styles = StyleSheet.create({
 
 });
 
-const mapStateToProps = ({ data }) => {
+const mapStateToProps = ({ data, user }) => {
 
     const { episodes } = data;
+    const { loggedInUser } = user
 
     return {
-        episodes
+        episodes, loggedInUser
     };
 };
 
-export default connect(mapStateToProps, { selectEpisode })(Featured);
+export default connect(mapStateToProps, { selectEpisode, setLoggedUser })(Featured);
