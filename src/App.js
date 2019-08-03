@@ -5,7 +5,7 @@ import { createStore, applyMiddleware } from 'redux';
 import firebase from 'firebase';
 import ReduxThunk from 'redux-thunk';
 import reducers from './reducers';
-import { addNavigationHelpers, NavigationActions } from 'react-navigation';
+import { createAppContainer, NavigationActions } from 'react-navigation';
 import { BackHandler } from "react-native";
 import AppNavigator from './AppNavigator';
 
@@ -24,6 +24,9 @@ if (firebase.apps.length === 0) {
 
 UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
+// const AppContainer = createAppContainer(AppNavigator);
+const AppContainer = createAppContainer(AppNavigator);
+
 class ReduxNavigation extends React.Component {
     componentDidMount() {
         BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
@@ -41,13 +44,15 @@ class ReduxNavigation extends React.Component {
     };
 
     render() {
-        const { dispatch, nav } = this.props;
-        const navigation = addNavigationHelpers({
-            dispatch,
-            state: nav
-        });
+        // const { dispatch, nav } = this.props;
+        // const navigation = addNavigationHelpers({
+        //     dispatch,
+        //     state: nav
+        // });
 
-        return <AppNavigator navigation={navigation} />;
+        
+
+        return <AppContainer />;
     }
 }
 
@@ -64,3 +69,21 @@ export default () => (
         <AppWithNavigation />
     </Provider>
 );
+
+// UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+
+
+
+// const mapStateToProps = (state) => ({
+//     nav: state.nav
+// });
+
+// const AppWithNavigation = connect(mapStateToProps)(ReduxNavigation);
+
+// const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
+
+// export default () => (
+//     <Provider store={store}>
+//         <AppWithNavigation />
+//     </Provider>
+// );

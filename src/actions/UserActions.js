@@ -44,15 +44,17 @@ export const login = (userData) => {
     };
 };
 
-export const setLoggedUser = () => {
+export const setLoggedUser = (navigator) => {
 
     return(dispatch) => {
 
         firebase.auth().onAuthStateChanged((user) => {
             console.log("Got user", user)
             if (user) {
+                navigator.setParams({ selectionState: "Profile" })
                 dispatch({type: SET_USER, payload: user})
             } else {
+                navigator.setParams({ selectionState: "SignUp" })
                 dispatch({type: SET_USER, payload: null})
             }
         });

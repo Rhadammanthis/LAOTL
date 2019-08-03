@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import {
     Platform, StyleSheet, Text, View,
     ActivityIndicator, Animated, ScrollView,
-    TouchableOpacity, Image
+    TouchableOpacity, Image, BackHandler
 } from 'react-native';
 import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation';
 import { selectEpisode, setLoggedUser } from '../actions'
 
 class Featured extends Component {
@@ -12,12 +13,13 @@ class Featured extends Component {
     componentWillMount() {
 
         console.log('From firebase', this.props.episodes)
-        this.props.setLoggedUser();
-        // console.log("Parent", this.props.navigation.dangerouslyGetParent())
+        this.props.setLoggedUser(this.props.navigation.dangerouslyGetParent());
+        // this.props.navigation.dangerouslyGetParent().setParams({ selectionState: "Buffer" })
+        // console.log("Parent", this.props.navigation.dangerouslyGetParent().setParams({ selectionState: "Buffer" }))
 
     }
 
-    onEpisodeSelected(){
+    onEpisodeSelected() {
         // console.log('Clicked!')
         this.props.selectEpisode(this.props.episode, this.props.navigate)
     }
@@ -35,19 +37,20 @@ class Featured extends Component {
 
     render() {
 
-        var mappedEpisodes = Object.keys(this.props.episodes).map((x) => { 
+        var mappedEpisodes = Object.keys(this.props.episodes).map((x) => {
             var firebaseId = x;
             this.props.episodes[x].firebaseId = firebaseId
-            return this.props.episodes[x] }
+            return this.props.episodes[x]
+        }
         )
         let newestEpisode = mappedEpisodes.length - 1;
         let lastRecentEpisode = mappedEpisodes.length - 7;
         let recentEpisodes = [];
 
-        for(let i = newestEpisode; i > lastRecentEpisode; i--){
-            
-            recentEpisodes.push(  
-                <TouchableOpacity key={i} style={ [styles.featureView] } onPress={() => { this.props.selectEpisode(mappedEpisodes[i], mappedEpisodes[i].firebaseId, this.props.navigation.navigate) }}>
+        for (let i = newestEpisode; i > lastRecentEpisode; i--) {
+
+            recentEpisodes.push(
+                <TouchableOpacity key={i} style={[styles.featureView]} onPress={() => { this.props.selectEpisode(mappedEpisodes[i], mappedEpisodes[i].firebaseId, this.props.navigation.navigate) }}>
                     <View style={{ flex: 1 }}>
                         <Image style={{ flex: 1, alignItems: 'center', flexDirection: 'column', justifyContent: 'space-around' }}
                             source={{ uri: mappedEpisodes[i].cover_image }}
@@ -69,7 +72,7 @@ class Featured extends Component {
                 </TouchableOpacity>
             )
         }
-                
+
 
         // var sortCategoryResource = (category) => {
         //     switch (category) {
@@ -99,7 +102,7 @@ class Featured extends Component {
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <ScrollView>
-                    { recentEpisodes }
+                    {recentEpisodes}
                 </ScrollView>
             </View>
         );

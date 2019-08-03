@@ -1,5 +1,5 @@
 import React from 'react';
-import { StackNavigator, TabNavigator } from 'react-navigation';
+import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
@@ -9,9 +9,8 @@ import Episode from './components/Episode'
 import AddNew from './components/AddNew'
 import SignUp from './components/SignUp'
 import Profile from './components/Profile'
-import Buffer from './components/SignUp'
 
-var mainFlow = TabNavigator(
+var mainFlow = createMaterialTopTabNavigator(
 	{
 		Featured: {
 			screen: Featured,
@@ -60,7 +59,7 @@ var mainFlow = TabNavigator(
 	}
 )
 
-export default StackNavigator(
+export default StackNav = createStackNavigator(
 	{
 		SplashScreen: {
 			screen: SplashScreen,
@@ -72,16 +71,23 @@ export default StackNavigator(
 			screen: mainFlow,
 			navigationOptions: ({ navigation }) => {
 				let selected = navigation.state.params && navigation.state.params.selectionState;
-				console.log("Selected",navigation)
-				// console.log("Slection",navigation.state.params.selectionState)
+				console.log("Selected", navigation)
+				console.log("Slection" + selected, selected)
 				return ({
+					headerStyle: {
+						backgroundColor: '#211f19'
+					},
+					headerTitleStyle:{
+						color:"#F37752"
+					},
 					title: 'Last App On The Left',
-					headerRight: <Icon onPress={() => { navigation.navigate("Buffer")}} name={"md-contact"} style={{ color: 'grey', fontSize: 30, marginHorizontal: 10 }} />
+					headerLeft: null,
+					headerRight: <Icon onPress={() => { navigation.navigate(selected) }} name={"md-contact"} style={{ color: 'grey', fontSize: 30, marginHorizontal: 10 }} />
 				})
 			}
 		},
-		Buffer: {
-			screen: Buffer,
+		SignUp: {
+			screen: SignUp,
 			navigationOptions: ({ navigation }) => ({
 				header: null
 			})
@@ -104,5 +110,7 @@ export default StackNavigator(
 				header: null
 			})
 		},
+	},{
+		headerLayoutPreset:"center",
 	}
 );
