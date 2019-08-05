@@ -5,7 +5,6 @@ import {
     Text,
     View,
     ActivityIndicator,
-    Animated,
     StatusBar
 } from 'react-native';
 import { connect } from 'react-redux';
