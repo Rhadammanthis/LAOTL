@@ -1,12 +1,16 @@
-import { StackNavigator, TabNavigator } from 'react-navigation';
+import React from 'react';
+import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
+import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
 import Archive from './components/Archive';
 import Search from './components/Search';
 import Episode from './components/Episode'
 import AddNew from './components/AddNew'
+import SignUp from './components/SignUp'
+import Profile from './components/Profile'
 
-var mainFlow = TabNavigator(
+var mainFlow = createMaterialTopTabNavigator(
 	{
 		Featured: {
 			screen: Featured,
@@ -55,7 +59,7 @@ var mainFlow = TabNavigator(
 	}
 )
 
-export default StackNavigator(
+export default StackNav = createStackNavigator(
 	{
 		SplashScreen: {
 			screen: SplashScreen,
@@ -65,8 +69,33 @@ export default StackNavigator(
 		},
 		MainFlow: {
 			screen: mainFlow,
+			navigationOptions: ({ navigation }) => {
+				let selected = navigation.state.params && navigation.state.params.selectionState;
+				console.log("Selected", navigation)
+				console.log("Slection" + selected, selected)
+				return ({
+					headerStyle: {
+						backgroundColor: '#211f19'
+					},
+					headerTitleStyle:{
+						color:"#F37752"
+					},
+					title: 'Last App On The Left',
+					headerLeft: null,
+					headerRight: <Icon onPress={() => { navigation.navigate(selected) }} name={"md-contact"} style={{ color: 'grey', fontSize: 30, marginHorizontal: 10 }} />
+				})
+			}
+		},
+		SignUp: {
+			screen: SignUp,
 			navigationOptions: ({ navigation }) => ({
-				title: 'Last App On The Left',
+				header: null
+			})
+		},
+		Profile: {
+			screen: Profile,
+			navigationOptions: ({ navigation }) => ({
+				header: null
 			})
 		},
 		Episode: {
@@ -81,5 +110,7 @@ export default StackNavigator(
 				header: null
 			})
 		},
+	},{
+		headerLayoutPreset:"center",
 	}
 );

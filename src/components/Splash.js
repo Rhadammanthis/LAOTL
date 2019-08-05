@@ -5,11 +5,10 @@ import {
     Text,
     View,
     ActivityIndicator,
-    Animated,
     StatusBar
 } from 'react-native';
 import { connect } from 'react-redux';
-import { dataFetch, checkNetwork } from '../actions';
+import { dataFetch, checkNetwork, setLoggedUser } from '../actions';
 import firebase from 'firebase';
 import _ from 'lodash';
 
@@ -99,4 +98,4 @@ const mapStateToProps = ({ splash, data }) => {
     };
 };
 
-export default connect(mapStateToProps, { dataFetch, checkNetwork })(Splash);
+export default connect(mapStateToProps, { dataFetch, checkNetwork, setLoggedUser })(Splash);
