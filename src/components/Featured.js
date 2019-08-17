@@ -49,6 +49,8 @@ class Featured extends Component {
 
         for (let i = newestEpisode; i > lastRecentEpisode; i--) {
 
+            Image.prefetch(mappedEpisodes[i].cover_image)
+
             recentEpisodes.push(
                 <TouchableOpacity key={i} style={[styles.featureView]} onPress={() => { this.props.selectEpisode(mappedEpisodes[i], mappedEpisodes[i].firebaseId, this.props.navigation.navigate) }}>
                     <View style={{ flex: 1 }}>

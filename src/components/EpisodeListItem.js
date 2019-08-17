@@ -9,7 +9,8 @@ import { selectEpisode } from '../actions'
 
 class EpisodeListItem extends Component {
 
-    componentWillMount() {
+    componentDidMount() {
+        Image.prefetch(this.props.episode.cover_image)
     }
 
     onEpisodeSelected(){
@@ -61,7 +62,7 @@ class EpisodeListItem extends Component {
                         </Text>
                     </View>
                     <Image style={{ flex: 3, height: 100 }}
-                        source={{ uri: episode.image }} />
+                        source={{ uri: episode.cover_image }} />
                 </View>
             </TouchableOpacity>
         )
