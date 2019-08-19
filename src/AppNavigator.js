@@ -1,5 +1,5 @@
 import React from 'react';
-import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
+import { createStackNavigator, createMaterialTopTabNavigator, createAppContainer, createSwitchNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from './components/Splash';
 import Featured from './components/Featured';
@@ -59,7 +59,7 @@ var mainFlow = createMaterialTopTabNavigator(
 	}
 )
 
-export default StackNav = createStackNavigator(
+const stackNav = createStackNavigator(
 	{
 		SplashScreen: {
 			screen: SplashScreen,
@@ -86,12 +86,6 @@ export default StackNav = createStackNavigator(
 				})
 			}
 		},
-		SignUp: {
-			screen: SignUp,
-			navigationOptions: ({ navigation }) => ({
-				header: null
-			})
-		},
 		Profile: {
 			screen: Profile,
 			navigationOptions: ({ navigation }) => ({
@@ -114,3 +108,20 @@ export default StackNav = createStackNavigator(
 		headerLayoutPreset:"center",
 	}
 );
+
+const authStack = createStackNavigator({
+	SignUp: {
+		screen: SignUp,
+		navigationOptions: ({ navigation }) => ({
+			header: null
+		})
+	},
+})
+
+export default createAppContainer(createStackNavigator({
+	App: stackNav,
+	Auth: authStack
+},{
+    mode: 'modal',
+    headerMode: 'none',
+}))

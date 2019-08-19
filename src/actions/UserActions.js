@@ -54,7 +54,7 @@ export const setLoggedUser = (navigator) => {
                 navigator.setParams({ selectionState: "Profile" })
                 dispatch({type: SET_USER, payload: user})
             } else {
-                navigator.setParams({ selectionState: "SignUp" })
+                navigator.setParams({ selectionState: "Auth" })
                 dispatch({type: SET_USER, payload: null})
             }
         });

@@ -38,15 +38,15 @@ class SignUp extends Component {
         // });
     }
 
-    _renderLoginForm() {
+    _renderSignUpForm() {
         return(
             <Form
                     style={{ marginHorizontal: 20 }}
                     onSubmit={(data) => {
                         console.log("Data", data)
-                        this.props.login(data)
+                        // this.props.createUser(data)
                     }}
-                    buttonText="Log in"
+                    buttonText="Create Account"
                     fields={[
                         {
                             label: "Name",
@@ -73,16 +73,18 @@ class SignUp extends Component {
 
     }
 
-    _renderSignUpForm() {
+    _renderLoginForm() {
         return (
             <Form
                 style={{ marginHorizontal: 20 }}
                 onSubmit={(data) => {
                     console.log("Data", data)
-                    this.props.createUser(data)
+                    const { navigate } = this.props.navigation;
+                    navigate('Profile')
+                    // this.props.login(data)
                 }}
                 password={true}
-                buttonText="Create Account"
+                buttonText="Log In"
                 fields={[
                     {
                         label: "Email",

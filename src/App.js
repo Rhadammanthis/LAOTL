@@ -25,14 +25,17 @@ if (firebase.apps.length === 0) {
 
 UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
-const AppContainer = createAppContainer(AppNavigator);
+// const AppContainer = createAppContainer(AppNavigator);
 
 const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
 
 export default () => (
     <Provider store={store}>
-        <AppContainer onNavigationStateChange={(prevState, newState, action)=>{
-            if(action.type === "Navigation/BACK" && newState.index === 0 && Platform.OS === 'android'){
+        <AppNavigator onNavigationStateChange={(prevState, newState, action)=>{
+            console.log("PrevState", prevState)
+            console.log("NewState", newState)
+            console.log("Action", action)
+            if(action.type === "Navigation/BACK" && prevState.index === 0 && newState.routes[0].index === 0 && Platform.OS === 'android'){
                 BackHandler.exitApp()
             }
         }} />

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import {
     StyleSheet, Text, View,
-    Image, TouchableNativeFeedback,
-    SectionList, Animated, Platform,
+    Image,
+    SectionList, Animated,
     Dimensions, StatusBar, LayoutAnimation, Easing,
-    Linking, TouchableOpacity, ScrollView, Button,
-    TextInput
+    Linking, TouchableOpacity, ScrollView
 } from 'react-native';
 // import Modal from 'react-native-modal';
 import SingleChoiceModal from '../components/common/SingleChoiceModal';
